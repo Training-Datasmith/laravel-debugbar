@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Fruitcake\LaravelDebugbar\CollectorProviders;
 
-use Fruitcake\LaravelDebugbar\LaravelDebugbar;
 use DebugBar\DataCollector\DataCollectorInterface;
+use Fruitcake\LaravelDebugbar\LaravelDebugbar;
 
 abstract class AbstractCollectorProvider
 {
     public function __construct(
         protected readonly LaravelDebugbar $debugbar,
-    ) {}
+    ) {
+    }
 
     protected function addCollector(DataCollectorInterface $collector): void
     {

@@ -11,7 +11,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class LaravelHttpDriver implements HttpDriverInterface
 {
-    public function __construct(protected Request $request, protected ?Response $response = null) {}
+    public function __construct(protected Request $request, protected ?Response $response = null)
+    {
+    }
 
     public function setRequest(Request $request): void
     {

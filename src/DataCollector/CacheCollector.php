@@ -8,10 +8,11 @@ use DebugBar\DataCollector\AssetProvider;
 use DebugBar\DataCollector\HasTimeDataCollector;
 use DebugBar\DataCollector\Resettable;
 use DebugBar\DataCollector\TimeDataCollector;
-use Illuminate\Cache\Events\{CacheEvent,
+use Illuminate\Cache\Events\{
+    CacheEvent,
     CacheFailedOver,
-    CacheFlushed,
     CacheFlushFailed,
+    CacheFlushed,
     CacheFlushing,
     CacheHit,
     CacheMissed,
@@ -21,7 +22,8 @@ use Illuminate\Cache\Events\{CacheEvent,
     KeyWriteFailed,
     KeyWritten,
     RetrievingKey,
-    WritingKey};
+    WritingKey
+};
 use Illuminate\Support\Facades\Route;
 use Throwable;
 

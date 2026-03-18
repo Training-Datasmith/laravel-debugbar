@@ -32,6 +32,6 @@ class RequestCollectorProvider extends AbstractCollectorProvider
 
         $this->addCollector($requestCollector);
 
-        $events->listen(ResponsePrepared::class, fn(ResponsePrepared $e) => $requestCollector->setResponse($e->response));
+        $events->listen(ResponsePrepared::class, fn (ResponsePrepared $e) => $requestCollector->setResponse($e->response));
     }
 }

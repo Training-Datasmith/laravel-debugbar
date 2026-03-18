@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Fruitcake\LaravelDebugbar\CollectorProviders;
 
 use Fruitcake\LaravelDebugbar\DataCollector\InertiaCollector;
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Events\ResponsePrepared;
 
 class InertiaCollectorProvider extends AbstractCollectorProvider
@@ -19,8 +19,8 @@ class InertiaCollectorProvider extends AbstractCollectorProvider
 
             $this->addCollector($inertiaCollector);
 
-            $events->listen(ResponsePrepared::class, fn(ResponsePrepared $e) => $inertiaCollector->addFromResponse($e->response));
-            $events->listen('composing:*', fn($event, $params) => $inertiaCollector->addFromView($params[0]));
+            $events->listen(ResponsePrepared::class, fn (ResponsePrepared $e) => $inertiaCollector->addFromResponse($e->response));
+            $events->listen('composing:*', fn ($event, $params) => $inertiaCollector->addFromView($params[0]));
         }
     }
 

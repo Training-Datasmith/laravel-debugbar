@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Fruitcake\LaravelDebugbar\Tests\DataCollector;
 
+use DebugBar\DataFormatter\DataFormatter;
 use Fruitcake\LaravelDebugbar\Tests\Models\User;
 use Fruitcake\LaravelDebugbar\Tests\TestCase;
-use DebugBar\DataFormatter\DataFormatter;
 use Illuminate\Support\Facades\Gate;
 
 class GateCollectorTest extends TestCase

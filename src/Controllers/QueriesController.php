@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Fruitcake\LaravelDebugbar\Controllers;
 
+use Exception;
 use Fruitcake\LaravelDebugbar\LaravelDebugbar;
 use Fruitcake\LaravelDebugbar\Requests\QueriesExplainRequest;
 use Fruitcake\LaravelDebugbar\Support\Explain;
-use Exception;
 
 class QueriesController
 {

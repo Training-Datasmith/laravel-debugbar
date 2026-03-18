@@ -50,8 +50,8 @@ class PennantCollectorTest extends TestCase
         debugbar()->boot();
 
         Feature::define('new-api', true);
-        Feature::define('old-api', fn() => false);
-        Feature::define('api-version', fn() => '3.x');
+        Feature::define('old-api', fn () => false);
+        Feature::define('api-version', fn () => '3.x');
 
         /** @var \Fruitcake\LaravelDebugbar\DataCollector\GateCollector $collector */
         $collector = debugbar()->getCollector('pennant');

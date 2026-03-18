@@ -24,6 +24,6 @@ class GateCollectorProvider extends AbstractCollectorProvider
             $gateCollector->setTimeDataCollector($this->debugbar->getTimeCollector());
         }
 
-        $events->listen(GateEvaluated::class, fn(GateEvaluated $event) => $gateCollector->addCheck($event->user, $event->ability, $event->result, $event->arguments));
+        $events->listen(GateEvaluated::class, fn (GateEvaluated $event) => $gateCollector->addCheck($event->user, $event->ability, $event->result, $event->arguments));
     }
 }

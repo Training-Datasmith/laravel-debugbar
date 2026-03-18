@@ -50,7 +50,7 @@ class LogsCollector extends MessagesCollector
         }
 
         //Load the latest lines, guessing about 15x the number of log entries (for stack traces etc)
-        $file = implode("", $this->tailFile($path, $this->lines));
+        $file = implode('', $this->tailFile($path, $this->lines));
         $basename = basename($path);
 
         foreach ($this->getLogs($file) as $log) {
@@ -70,14 +70,14 @@ class LogsCollector extends MessagesCollector
      */
     protected function tailFile(string $file, int $lines): array
     {
-        $handle = fopen($file, "r");
+        $handle = fopen($file, 'r');
         $linecounter = $lines;
         $pos = -2;
         $beginning = false;
         $text = [];
         try {
             while ($linecounter > 0) {
-                $t = " ";
+                $t = ' ';
                 while ($t !== "\n") {
                     if (fseek($handle, $pos, SEEK_END) === -1) {
                         $beginning = true;

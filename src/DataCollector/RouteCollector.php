@@ -61,7 +61,7 @@ class RouteCollector extends DataCollector implements Renderable
                     $controller = $component::class . '@' . $method;
                 }
             } catch (\Throwable) {
-                //
+
             }
         }
 
@@ -112,7 +112,7 @@ class RouteCollector extends DataCollector implements Renderable
      */
     protected function getMiddleware(mixed $route): string
     {
-        return implode(', ', array_map(fn($middleware): mixed => $middleware instanceof Closure ? 'Closure' : $middleware, $route->gatherMiddleware()));
+        return implode(', ', array_map(fn ($middleware): mixed => $middleware instanceof Closure ? 'Closure' : $middleware, $route->gatherMiddleware()));
     }
 
     /**
@@ -129,17 +129,17 @@ class RouteCollector extends DataCollector implements Renderable
     public function getWidgets(): array
     {
         $widget = match (true) {
-            $this->isJsonVarDumperUsed() => "PhpDebugBar.Widgets.JsonVariableListWidget",
-            $this->isHtmlVarDumperUsed() => "PhpDebugBar.Widgets.HtmlVariableListWidget",
-            default => "PhpDebugBar.Widgets.VariableListWidget",
+            $this->isJsonVarDumperUsed() => 'PhpDebugBar.Widgets.JsonVariableListWidget',
+            $this->isHtmlVarDumperUsed() => 'PhpDebugBar.Widgets.HtmlVariableListWidget',
+            default => 'PhpDebugBar.Widgets.VariableListWidget',
         };
 
         return [
-            "route" => [
-                "icon" => "share-3",
-                "widget" => $widget,
-                "map" => "route",
-                "default" => "{}",
+            'route' => [
+                'icon' => 'share-3',
+                'widget' => $widget,
+                'map' => 'route',
+                'default' => '{}',
             ],
         ];
     }

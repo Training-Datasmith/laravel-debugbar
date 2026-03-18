@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Fruitcake\LaravelDebugbar\Tests\DataCollector;
 
+use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataFormatter\HtmlDataFormatter;
 use Fruitcake\LaravelDebugbar\DataCollector\RouteCollector;
 use Fruitcake\LaravelDebugbar\Tests\TestCase;
-use DebugBar\DataCollector\DataCollector;
 
 class RouteCollectorTest extends TestCase
 {

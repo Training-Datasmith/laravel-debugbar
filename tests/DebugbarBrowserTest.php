@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Fruitcake\LaravelDebugbar\Tests;
 
+use Illuminate\Database\Connection;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Routing\Router;
 use Laravel\Dusk\Browser;
-use Illuminate\Database\Events\QueryExecuted;
-use Illuminate\Database\Connection;
 
 class DebugbarBrowserTest extends BrowserTestCase
 {

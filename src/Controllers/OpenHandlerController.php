@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Fruitcake\LaravelDebugbar\Controllers;
 
 use DebugBar\Bridge\Symfony\SymfonyHttpDriver;
+use DebugBar\OpenHandler;
 use Fruitcake\LaravelDebugbar\LaravelDebugbar;
 use Fruitcake\LaravelDebugbar\LaravelHttpDriver;
 use Fruitcake\LaravelDebugbar\Requests\OpenHandlerRequest;
 use Fruitcake\LaravelDebugbar\Support\Clockwork\Converter;
-use DebugBar\OpenHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
@@ -20,7 +20,7 @@ class OpenHandlerController
         if ($request->validated('op') !== 'get' && !$debugbar->isStorageOpen($request)) {
             return new JsonResponse([
                 [
-                    'datetime' => date("Y-m-d H:i:s"),
+                    'datetime' => date('Y-m-d H:i:s'),
                     'id' => null,
                     'ip' => $request->getClientIp(),
                     'method' => 'ERROR',

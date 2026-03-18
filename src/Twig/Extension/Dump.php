@@ -9,4 +9,6 @@ use DebugBar\Bridge\Twig\DumpTwigExtension;
 /**
  * Dump variables using the DataFormatter
  */
-class Dump extends DumpTwigExtension {}
+class Dump extends DumpTwigExtension
+{
+}

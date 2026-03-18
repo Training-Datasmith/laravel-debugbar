@@ -28,7 +28,7 @@ class QueryFormatterTest extends TestCase
 
         $output = $queryFormatter->checkBindings($bindings);
 
-        static::assertSame($output, ["some string", "[string,Another ' string,[nested,array]]"]);
+        static::assertSame($output, ['some string', "[string,Another ' string,[nested,array]]"]);
     }
 
     public function testItFormatsObjectBindings()

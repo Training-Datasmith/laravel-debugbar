@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Fruitcake\LaravelDebugbar\CollectorProviders;
 
-use Fruitcake\LaravelDebugbar\DataCollector\HttpClientCollector;
 use DebugBar\DataCollector\TimeDataCollector;
+use Fruitcake\LaravelDebugbar\DataCollector\HttpClientCollector;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Client\Events\ConnectionFailed;
 use Illuminate\Http\Client\Events\ResponseReceived;
@@ -30,8 +30,8 @@ class HttpClientCollectorProvider extends AbstractCollectorProvider
 
         $this->addCollector($httpClientCollector);
 
-        $events->listen(ResponseReceived::class, fn(ResponseReceived $e) => $this->addEvent($e));
-        $events->listen(ConnectionFailed::class, fn(ConnectionFailed $e) => $this->addEvent($e));
+        $events->listen(ResponseReceived::class, fn (ResponseReceived $e) => $this->addEvent($e));
+        $events->listen(ConnectionFailed::class, fn (ConnectionFailed $e) => $this->addEvent($e));
     }
 
     protected function addEvent(ResponseReceived|ConnectionFailed $event): void

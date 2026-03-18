@@ -31,7 +31,7 @@ class CacheCollectorProvider extends AbstractCollectorProvider
         }
 
         $startEvents = array_unique(array_filter(array_map(
-            fn(array $values) => $values[1] ?? null,
+            fn (array $values) => $values[1] ?? null,
             array_values($classMap),
         )));
 

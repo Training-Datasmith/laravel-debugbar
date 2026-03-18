@@ -30,10 +30,10 @@ class LogCollectorProvider extends AbstractCollectorProvider
                         $context = $log->context;
                         $logMessage .= ($context ? ' ' . json_encode($context, JSON_PRETTY_PRINT) : '');
                     } else {
-                        $logMessage = "[INVALID UTF-8 DATA]";
+                        $logMessage = '[INVALID UTF-8 DATA]';
                     }
                 } catch (\Throwable $e) {
-                    $logMessage = "[Exception: " . $e->getMessage() . "]";
+                    $logMessage = '[Exception: ' . $e->getMessage() . ']';
                 }
                 $logCollector->log(
                     $log->level,

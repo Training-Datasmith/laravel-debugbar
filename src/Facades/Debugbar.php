@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Fruitcake\LaravelDebugbar\Facades;
 
-use Fruitcake\LaravelDebugbar\LaravelDebugbar;
 use DebugBar\DataCollector\DataCollectorInterface;
+use Fruitcake\LaravelDebugbar\LaravelDebugbar;
 
 /**
  * @method static LaravelDebugbar addCollector(DataCollectorInterface $collector)

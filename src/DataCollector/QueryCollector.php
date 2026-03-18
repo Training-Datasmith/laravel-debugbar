@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Fruitcake\LaravelDebugbar\DataCollector;
 
-use DebugBar\DataCollector\Resettable;
-use Fruitcake\LaravelDebugbar\Support\Explain;
 use DebugBar\DataCollector\AssetProvider;
 use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\HasTimeDataCollector;
 use DebugBar\DataCollector\Renderable;
+use DebugBar\DataCollector\Resettable;
 use DebugBar\DataFormatter\QueryFormatter;
+use Fruitcake\LaravelDebugbar\Support\Explain;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Support\Str;
@@ -565,15 +565,15 @@ class QueryCollector extends DataCollector implements Renderable, AssetProvider,
     public function getWidgets(): array
     {
         return [
-            "queries" => [
-                "icon" => "database",
-                "widget" => "PhpDebugBar.Widgets.LaravelQueriesWidget",
-                "map" => "queries",
-                "default" => "[]",
+            'queries' => [
+                'icon' => 'database',
+                'widget' => 'PhpDebugBar.Widgets.LaravelQueriesWidget',
+                'map' => 'queries',
+                'default' => '[]',
             ],
-            "queries:badge" => [
-                "map" => "queries.nb_statements",
-                "default" => 0,
+            'queries:badge' => [
+                'map' => 'queries.nb_statements',
+                'default' => 0,
             ],
         ];
     }

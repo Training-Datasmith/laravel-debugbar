@@ -52,7 +52,7 @@ class GateCollector extends MessagesCollector implements Resettable
             }
         }
 
-        $this->addMessage("{ability} {target}", $label, [
+        $this->addMessage('{ability} {target}', $label, [
             'ability' => $ability,
             'target' => $target,
             'result' => $result,

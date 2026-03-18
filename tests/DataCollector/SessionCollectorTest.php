@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Fruitcake\LaravelDebugbar\Tests\DataCollector;
 
-use Fruitcake\LaravelDebugbar\Tests\TestCase;
-use Fruitcake\LaravelDebugbar\DataCollector\SessionCollector;
 use DebugBar\DataFormatter\DataFormatter;
+use Fruitcake\LaravelDebugbar\DataCollector\SessionCollector;
+use Fruitcake\LaravelDebugbar\Tests\TestCase;
 
 class SessionCollectorTest extends TestCase
 {
@@ -22,7 +22,7 @@ class SessionCollectorTest extends TestCase
 
         static::assertEmpty($collector->collect());
 
-        $this->withSession(['testVariable' => "1", 'secret' => 'testSecret'])->get('/');
+        $this->withSession(['testVariable' => '1', 'secret' => 'testSecret'])->get('/');
 
         $collected = $collector->collect();
 
@@ -30,7 +30,7 @@ class SessionCollectorTest extends TestCase
         static::assertArrayHasKey('secret', $collected);
         static::assertArrayHasKey('testVariable', $collected);
         static::assertEquals('te***et', $collected['secret']);
-        static::assertEquals("1", $collected['testVariable']);
+        static::assertEquals('1', $collected['testVariable']);
 
         $this->flushSession();
         static::assertCount(0, $collector->collect());

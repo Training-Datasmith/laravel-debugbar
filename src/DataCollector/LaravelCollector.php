@@ -17,7 +17,7 @@ class LaravelCollector extends DataCollector implements Renderable
     {
         $app = app();
         return [
-            "version" => Str::of($app->version())->explode('.')->first() . '.x',
+            'version' => Str::of($app->version())->explode('.')->first() . '.x',
             'tooltip' => array_filter([
                 'Laravel Version' => $app->version(),
                 'PHP Version' => phpversion(),
@@ -49,14 +49,14 @@ class LaravelCollector extends DataCollector implements Renderable
     public function getWidgets(): array
     {
         return [
-            "version" => [
-                "icon" => "brand-laravel",
-                "map" => "laravel.version",
-                "default" => "",
+            'version' => [
+                'icon' => 'brand-laravel',
+                'map' => 'laravel.version',
+                'default' => '',
             ],
-            "version:tooltip" => [
-                "map" => "laravel.tooltip",
-                "default" => "{}",
+            'version:tooltip' => [
+                'map' => 'laravel.tooltip',
+                'default' => '{}',
             ],
         ];
     }

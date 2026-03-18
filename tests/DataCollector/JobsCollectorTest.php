@@ -80,7 +80,7 @@ class JobsCollectorTest extends TestCase
 
     protected function createJobsTable()
     {
-        (new class extends Migration {
+        (new class () extends Migration {
             public function up()
             {
                 if (Schema::hasTable('jobs')) {

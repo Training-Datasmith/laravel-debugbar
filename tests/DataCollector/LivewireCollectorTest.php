@@ -61,7 +61,7 @@ class LivewireCollectorTest extends TestCase
 
         static::assertInstanceOf(LivewireCollector::class, $collector);
 
-        $component = new class extends Component {
+        $component = new class () extends Component {
             public $title = 'MyComponent';
         };
 

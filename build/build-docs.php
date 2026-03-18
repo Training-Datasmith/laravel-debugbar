@@ -1,9 +1,6 @@
 <?php
 
-use DebugBar\Bridge\Symfony\SymfonyMailCollector;
-use DebugBar\DataCollector\PDO\PDOCollector;
-use DebugBar\DataCollector\TemplateCollector;
-use DebugBar\StandardDebugBar;
+declare(strict_types=1);
 
 include __DIR__ . '/../vendor/autoload.php';
 
@@ -17,8 +14,8 @@ $templatePath = __DIR__ . '/../docs/overrides/main.html';
 $template = file_get_contents($templatePath);
 
 // Replace the scripts block content between specific markers
-$startMarker = "<!-- Start Debugbar -->";
-$endMarker = "<!-- End Debugbar -->";
+$startMarker = '<!-- Start Debugbar -->';
+$endMarker = '<!-- End Debugbar -->';
 
 // Find the positions
 $startPos = strpos($template, $startMarker);
@@ -86,7 +83,8 @@ file_put_contents($mkdocsPath, $mkdocsContent);
 
 echo "✓ Updated mkdocs.yml with timestamp: $timestamp\n";
 
-function copyDirectory($source, $dest) {
+function copyDirectory($source, $dest)
+{
     mkdir($dest, 0755, true);
 
     $iterator = new RecursiveIteratorIterator(
@@ -104,7 +102,8 @@ function copyDirectory($source, $dest) {
     }
 }
 
-function deleteDirectory($dir) {
+function deleteDirectory($dir)
+{
     if (!is_dir($dir)) {
         return;
     }

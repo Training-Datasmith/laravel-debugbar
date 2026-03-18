@@ -129,7 +129,7 @@ class Explain
 
     private static function redactBindings(array $bindings): array
     {
-        return array_map(fn(): string => '?', $bindings);
+        return array_map(fn (): string => '?', $bindings);
     }
 
     private function generateVisualExplainMysql(ConnectionInterface $connection, string $query, array $bindings): string
@@ -139,9 +139,9 @@ class Explain
         ])->post('https://api.mysqlexplain.com/v2/explains', [
             'query' => $query,
             'bindings' => self::redactBindings($bindings),
-            'version' => $connection->selectOne("SELECT VERSION()")->{'VERSION()'},
+            'version' => $connection->selectOne('SELECT VERSION()')->{'VERSION()'},
             'explain_json' => $connection->selectOne("EXPLAIN FORMAT=JSON {$query}", $bindings)->EXPLAIN,
-            'explain_tree' => rescue(fn() => $connection->selectOne("EXPLAIN FORMAT=TREE {$query}", $bindings)->EXPLAIN, report: false),
+            'explain_tree' => rescue(fn () => $connection->selectOne("EXPLAIN FORMAT=TREE {$query}", $bindings)->EXPLAIN, report: false),
         ])->throw()->json('url');
     }
 

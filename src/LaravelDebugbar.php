@@ -5,22 +5,30 @@ declare(strict_types=1);
 namespace Fruitcake\LaravelDebugbar;
 
 use DebugBar\Bridge\Symfony\SymfonyHttpDriver;
+use DebugBar\DataCollector\DataCollector;
+use DebugBar\DataCollector\DataCollectorInterface;
+use DebugBar\DataCollector\ExceptionsCollector;
+use DebugBar\DataCollector\MessagesCollector;
 use DebugBar\DataCollector\TimeDataCollector;
 use DebugBar\DataFormatter\JsonDataFormatter;
+use DebugBar\DebugBar;
+use DebugBar\HttpDriverInterface;
 use DebugBar\JavascriptRenderer;
 use DebugBar\RequestIdGeneratorInterface;
 use DebugBar\Storage\FileStorage;
-use Fruitcake\LaravelDebugbar\CollectorProviders\ConfigCollectorProvider;
-use Fruitcake\LaravelDebugbar\CollectorProviders\ExceptionsCollectorProvider;
-use Fruitcake\LaravelDebugbar\CollectorProviders\HttpClientCollectorProvider;
-use Fruitcake\LaravelDebugbar\CollectorProviders\InertiaCollectorProvider;
-use Fruitcake\LaravelDebugbar\CollectorProviders\RequestCollectorProvider;
-use Fruitcake\LaravelDebugbar\CollectorProviders\SessionCollectorProvider;
+use DebugBar\Storage\PdoStorage;
+use DebugBar\Storage\RedisStorage;
+use DebugBar\Storage\SqliteStorage;
+use Exception;
 use Fruitcake\LaravelDebugbar\CollectorProviders\AuthCollectorProvider;
 use Fruitcake\LaravelDebugbar\CollectorProviders\CacheCollectorProvider;
+use Fruitcake\LaravelDebugbar\CollectorProviders\ConfigCollectorProvider;
 use Fruitcake\LaravelDebugbar\CollectorProviders\DatabaseCollectorProvider;
 use Fruitcake\LaravelDebugbar\CollectorProviders\EventsCollectorCollectorProvider;
+use Fruitcake\LaravelDebugbar\CollectorProviders\ExceptionsCollectorProvider;
 use Fruitcake\LaravelDebugbar\CollectorProviders\GateCollectorProvider;
+use Fruitcake\LaravelDebugbar\CollectorProviders\HttpClientCollectorProvider;
+use Fruitcake\LaravelDebugbar\CollectorProviders\InertiaCollectorProvider;
 use Fruitcake\LaravelDebugbar\CollectorProviders\JobsCollectorProvider;
 use Fruitcake\LaravelDebugbar\CollectorProviders\LaravelCollectorProvider;
 use Fruitcake\LaravelDebugbar\CollectorProviders\LivewireCollectorProvider;
@@ -32,21 +40,13 @@ use Fruitcake\LaravelDebugbar\CollectorProviders\MessagesCollectorProvider;
 use Fruitcake\LaravelDebugbar\CollectorProviders\ModelsCollectorProvider;
 use Fruitcake\LaravelDebugbar\CollectorProviders\PennantCollectorProvider;
 use Fruitcake\LaravelDebugbar\CollectorProviders\PhpInfoCollectorProvider;
+use Fruitcake\LaravelDebugbar\CollectorProviders\RequestCollectorProvider;
 use Fruitcake\LaravelDebugbar\CollectorProviders\RouteCollectorProvider;
+use Fruitcake\LaravelDebugbar\CollectorProviders\SessionCollectorProvider;
 use Fruitcake\LaravelDebugbar\CollectorProviders\TimeCollectorProvider;
 use Fruitcake\LaravelDebugbar\CollectorProviders\ViewsCollectorProvider;
 use Fruitcake\LaravelDebugbar\DataCollector\RequestCollector;
 use Fruitcake\LaravelDebugbar\Support\Clockwork\ClockworkCollector;
-use DebugBar\DataCollector\DataCollector;
-use DebugBar\DataCollector\DataCollectorInterface;
-use DebugBar\DataCollector\ExceptionsCollector;
-use DebugBar\DataCollector\MessagesCollector;
-use DebugBar\DebugBar;
-use DebugBar\HttpDriverInterface;
-use DebugBar\Storage\PdoStorage;
-use DebugBar\Storage\RedisStorage;
-use DebugBar\Storage\SqliteStorage;
-use Exception;
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Foundation\Application;
@@ -141,7 +141,7 @@ class LaravelDebugbar extends DebugBar
     public function getRequestIdGenerator(): RequestIdGeneratorInterface
     {
         if ($this->requestIdGenerator === null) {
-            $this->requestIdGenerator = new class implements RequestIdGeneratorInterface {
+            $this->requestIdGenerator = new class () implements RequestIdGeneratorInterface {
                 public function generate(): string
                 {
                     return (string) Str::ulid();
@@ -312,14 +312,14 @@ class LaravelDebugbar extends DebugBar
 
         $formatter->mergeClonerOptions([
             'casters' => [
-                \Illuminate\View\View::class => static fn(\Illuminate\View\View $view, array $a, Stub $stub): array => [
+                \Illuminate\View\View::class => static fn (\Illuminate\View\View $view, array $a, Stub $stub): array => [
                     'name' => $view->getName(),
                     'data' => $view->getData(),
                     'path' => $view->getPath(),
                     'engine' => $view->getEngine()::class,
                     'factory' => $view->getFactory()::class,
                 ],
-                \Illuminate\Database\ConnectionInterface::class => static fn(\Illuminate\Database\ConnectionInterface $connection, array $a, Stub $stub): array => [
+                \Illuminate\Database\ConnectionInterface::class => static fn (\Illuminate\Database\ConnectionInterface $connection, array $a, Stub $stub): array => [
                     'database' => $connection->getDatabaseName(),
                 ],
             ],
@@ -612,7 +612,7 @@ class LaravelDebugbar extends DebugBar
             return false;
         }
 
-        $except = array_map(fn($item): string => $item !== '/' ? trim((string) $item, '/') : $item, $except);
+        $except = array_map(fn ($item): string => $item !== '/' ? trim((string) $item, '/') : $item, $except);
 
         return $request->is($except);
     }
@@ -803,7 +803,7 @@ class LaravelDebugbar extends DebugBar
     /**
      * Check the version of Laravel
      */
-    public function checkVersion(string $version, string $operator = ">="): bool
+    public function checkVersion(string $version, string $operator = '>='): bool
     {
         return version_compare($this->app->version(), $version, $operator);
     }
@@ -857,7 +857,7 @@ class LaravelDebugbar extends DebugBar
     {
         $prefix = config('debugbar.route_prefix');
         $response->headers->set('X-Clockwork-Id', $this->getCurrentRequestId(), true);
-        $response->headers->set('X-Clockwork-Version', "9", true);
+        $response->headers->set('X-Clockwork-Version', '9', true);
         $response->headers->set('X-Clockwork-Path', $prefix . '/clockwork/', true);
     }
 

@@ -82,32 +82,32 @@ class DatabaseCollectorProvider extends AbstractCollectorProvider
         try {
             $events->listen(
                 TransactionBeginning::class,
-                fn($transaction) => $queryCollector->collectTransactionEvent('Begin Transaction', $transaction->connection),
+                fn ($transaction) => $queryCollector->collectTransactionEvent('Begin Transaction', $transaction->connection),
             );
 
             $events->listen(
                 TransactionCommitted::class,
-                fn($transaction) => $queryCollector->collectTransactionEvent('Commit Transaction', $transaction->connection),
+                fn ($transaction) => $queryCollector->collectTransactionEvent('Commit Transaction', $transaction->connection),
             );
 
             $events->listen(
                 TransactionRolledBack::class,
-                fn($transaction) => $queryCollector->collectTransactionEvent('Rollback Transaction', $transaction->connection),
+                fn ($transaction) => $queryCollector->collectTransactionEvent('Rollback Transaction', $transaction->connection),
             );
 
             $events->listen(
                 'connection.*.beganTransaction',
-                fn($event, $params) => $queryCollector->collectTransactionEvent('Begin Transaction', $params[0]),
+                fn ($event, $params) => $queryCollector->collectTransactionEvent('Begin Transaction', $params[0]),
             );
 
             $events->listen(
                 'connection.*.committed',
-                fn($event, $params) =>  $queryCollector->collectTransactionEvent('Commit Transaction', $params[0]),
+                fn ($event, $params) =>  $queryCollector->collectTransactionEvent('Commit Transaction', $params[0]),
             );
 
             $events->listen(
                 'connection.*.rollingBack',
-                fn($event, $params) => $queryCollector->collectTransactionEvent('Rollback Transaction', $params[0]),
+                fn ($event, $params) => $queryCollector->collectTransactionEvent('Rollback Transaction', $params[0]),
             );
 
             $events->listen(

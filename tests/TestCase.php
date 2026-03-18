@@ -7,11 +7,11 @@ namespace Fruitcake\LaravelDebugbar\Tests;
 use Fruitcake\LaravelDebugbar\Facades\Debugbar;
 use Fruitcake\LaravelDebugbar\LaravelDebugbar;
 use Fruitcake\LaravelDebugbar\ServiceProvider;
+use Fruitcake\LaravelDebugbar\Tests\Mocks\MockController;
+use Fruitcake\LaravelDebugbar\Tests\Mocks\MockMiddleware;
+use Fruitcake\LaravelDebugbar\Tests\Mocks\MockViewComponent;
 use Illuminate\Routing\Router;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Fruitcake\LaravelDebugbar\Tests\Mocks\MockController;
-use Fruitcake\LaravelDebugbar\Tests\Mocks\MockViewComponent;
-use Fruitcake\LaravelDebugbar\Tests\Mocks\MockMiddleware;
 use ReflectionObject;
 
 class TestCase extends Orchestra

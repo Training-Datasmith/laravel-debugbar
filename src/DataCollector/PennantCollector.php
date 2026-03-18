@@ -33,11 +33,11 @@ class PennantCollector extends DataCollector implements DataCollectorInterface, 
     public function getWidgets(): array
     {
         return [
-            "pennant" => [
-                "icon" => "flag",
-                "widget" => "PhpDebugBar.Widgets.VariableListWidget",
-                "map" => "pennant",
-                "default" => "{}",
+            'pennant' => [
+                'icon' => 'flag',
+                'widget' => 'PhpDebugBar.Widgets.VariableListWidget',
+                'map' => 'pennant',
+                'default' => '{}',
             ],
         ];
     }

@@ -7,8 +7,8 @@ namespace Fruitcake\LaravelDebugbar\DataCollector;
 use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\Renderable;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Support\Str;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Str;
 
 /**
  * Collector for Laravel's Auth provider
@@ -59,7 +59,7 @@ class MultiAuthCollector extends DataCollector implements Renderable
 
                     if (!is_null($user)) {
                         $data['guards'][$guardName] = $this->getUserInformation($user);
-                        $names .= $guardName . ": " . $data['guards'][$guardName]['name'] . ', ';
+                        $names .= $guardName . ': ' . $data['guards'][$guardName]['name'] . ', ';
                     }
                 } else {
                     $data['guards'][$guardName] = null;
@@ -133,15 +133,15 @@ class MultiAuthCollector extends DataCollector implements Renderable
 
         if ($this->showGuardsData) {
             $widget = match (true) {
-                $this->isJsonVarDumperUsed() => "PhpDebugBar.Widgets.JsonVariableListWidget",
-                $this->isHtmlVarDumperUsed() => "PhpDebugBar.Widgets.HtmlVariableListWidget",
-                default => "PhpDebugBar.Widgets.VariableListWidget",
+                $this->isJsonVarDumperUsed() => 'PhpDebugBar.Widgets.JsonVariableListWidget',
+                $this->isHtmlVarDumperUsed() => 'PhpDebugBar.Widgets.HtmlVariableListWidget',
+                default => 'PhpDebugBar.Widgets.VariableListWidget',
             };
-            $widgets["auth"] = [
-                "icon" => "lock",
-                "widget" => $widget,
-                "map" => "auth.guards",
-                "default" => "{}",
+            $widgets['auth'] = [
+                'icon' => 'lock',
+                'widget' => $widget,
+                'map' => 'auth.guards',
+                'default' => '{}',
             ];
         }
 

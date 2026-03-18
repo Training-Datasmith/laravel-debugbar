@@ -173,7 +173,7 @@ class RequestCollector extends SymfonyRequestCollector implements DataCollectorI
                     $controller = $component::class . '@' . $method;
                 }
             } catch (\Throwable) {
-                //
+
             }
         }
 
