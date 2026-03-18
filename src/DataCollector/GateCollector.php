@@ -42,9 +42,9 @@ class GateCollector extends MessagesCollector implements Resettable
             if ($arguments[0] instanceof Model) {
                 $model = $arguments[0];
                 if ($model->getKeyName() && isset($model[$model->getKeyName()])) {
-                    $target = get_class($model) . '(' . $model->getKeyName() . '=' . $model->getKey() . ')';
+                    $target = $model::class . '(' . $model->getKeyName() . '=' . $model->getKey() . ')';
                 } else {
-                    $target = get_class($model);
+                    $target = $model::class;
                 }
                 $arguments[0] = $target;
             } elseif (is_string($arguments[0])) {
@@ -63,7 +63,7 @@ class GateCollector extends MessagesCollector implements Resettable
 
     protected function getStackTraceItem(array $stacktrace): array
     {
-        foreach ($stacktrace as $i => $trace) {
+        foreach ($stacktrace as $trace) {
             if (!isset($trace['file'])) {
                 continue;
             }
@@ -128,7 +128,7 @@ class GateCollector extends MessagesCollector implements Resettable
 
         $xxh128Exists = in_array('xxh128', hash_algos(), true);
 
-        foreach ($property->getValue($finder) as $name => $path) {
+        foreach ($property->getValue($finder) as $path) {
             if (($xxh128Exists && hash('xxh128', 'v2' . $path) === $hash) || sha1('v2' . $path) === $hash) {
                 return $path;
             }

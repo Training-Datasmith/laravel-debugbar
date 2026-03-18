@@ -49,7 +49,7 @@ class Stopwatch extends MeasureTwigExtension
         ];
     }
 
-    public function startMeasure(...$arg)
+    public function startMeasure(...$arg): void
     {
         if (!$this->debugbar || !$this->debugbar->hasCollector('time')) {
             return;
@@ -58,7 +58,7 @@ class Stopwatch extends MeasureTwigExtension
         $this->debugbar->getCollector('time')->startMeasure(...$arg);
     }
 
-    public function stopMeasure(...$arg)
+    public function stopMeasure(...$arg): void
     {
         if (!$this->debugbar || !$this->debugbar->hasCollector('time')) {
             return;

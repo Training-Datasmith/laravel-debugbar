@@ -57,7 +57,7 @@ class LogsCollector extends MessagesCollector
             $this->messages[] = [
                 'message' => trim($log['header'] . $log['stack']),
                 'label' => $log['level'],
-                'time' => substr($log['header'], 1, 19),
+                'time' => substr((string) $log['header'], 1, 19),
                 'collector' => $basename,
                 'is_string' => false,
             ];

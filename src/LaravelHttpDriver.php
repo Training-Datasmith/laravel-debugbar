@@ -73,7 +73,7 @@ class LaravelHttpDriver implements HttpDriverInterface
     {
         $value = $this->request->cookie($name);
         if ($value !== null) {
-            $value = json_decode($value, true);
+            return json_decode($value, true);
         }
 
         return $value;

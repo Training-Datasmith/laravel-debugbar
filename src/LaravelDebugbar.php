@@ -90,7 +90,7 @@ class LaravelDebugbar extends DebugBar
      *
      * @var callable|null
      */
-    protected $prevErrorHandler = null;
+    protected $prevErrorHandler;
 
     protected ?string $editorTemplate = null;
     protected bool $responseIsModified = false;
@@ -204,7 +204,7 @@ class LaravelDebugbar extends DebugBar
             $errorLevel = $config->get('debugbar.error_level', E_ALL);
 
             // set error handler with configured error reporting level
-            $this->prevErrorHandler = set_error_handler([$this, 'handleError'], $errorLevel);
+            $this->prevErrorHandler = set_error_handler($this->handleError(...), $errorLevel);
         }
 
         $this->selectStorage($this);
@@ -312,20 +312,16 @@ class LaravelDebugbar extends DebugBar
 
         $formatter->mergeClonerOptions([
             'casters' => [
-                \Illuminate\View\View::class => static function (\Illuminate\View\View $view, array $a, Stub $stub): array {
-                    return [
-                        'name' => $view->getName(),
-                        'data' => $view->getData(),
-                        'path' => $view->getPath(),
-                        'engine' => get_class($view->getEngine()),
-                        'factory' => get_class($view->getFactory()),
-                    ];
-                },
-                \Illuminate\Database\ConnectionInterface::class => static function (\Illuminate\Database\ConnectionInterface $connection, array $a, Stub $stub): array {
-                    return [
-                        'database' => $connection->getDatabaseName(),
-                    ];
-                },
+                \Illuminate\View\View::class => static fn(\Illuminate\View\View $view, array $a, Stub $stub): array => [
+                    'name' => $view->getName(),
+                    'data' => $view->getData(),
+                    'path' => $view->getPath(),
+                    'engine' => $view->getEngine()::class,
+                    'factory' => $view->getFactory()::class,
+                ],
+                \Illuminate\Database\ConnectionInterface::class => static fn(\Illuminate\Database\ConnectionInterface $connection, array $a, Stub $stub): array => [
+                    'database' => $connection->getDatabaseName(),
+                ],
             ],
         ]);
 
@@ -531,7 +527,7 @@ class LaravelDebugbar extends DebugBar
         // Check if it's safe to inject the Debugbar
         if (
             $config->get('debugbar.inject', true)
-            && str_contains($response->headers->get('Content-Type', 'text/html'), 'html')
+            && str_contains((string) $response->headers->get('Content-Type', 'text/html'), 'html')
             && !$this->isJsonRequest($request)
             && !$this->isJsonResponse($response)
             && $response->getContent() !== false
@@ -616,9 +612,7 @@ class LaravelDebugbar extends DebugBar
             return false;
         }
 
-        $except = array_map(function ($item): string {
-            return $item !== '/' ? trim($item, '/') : $item;
-        }, $except);
+        $except = array_map(fn($item): string => $item !== '/' ? trim((string) $item, '/') : $item, $except);
 
         return $request->is($except);
     }
@@ -819,7 +813,7 @@ class LaravelDebugbar extends DebugBar
         /** @var Repository $config */
         $config = config();
         if ($config->get('debugbar.storage.enabled')) {
-            $driver = strtolower($config->get('debugbar.storage.driver', 'file'));
+            $driver = strtolower((string) $config->get('debugbar.storage.driver', 'file'));
 
             switch ($driver) {
                 case 'pdo':

@@ -29,8 +29,6 @@ class CacheCollector extends TimeDataCollector implements AssetProvider, Resetta
 {
     use HasTimeDataCollector;
 
-    protected bool $collectValues = false;
-
     protected array $eventStarts = [];
 
     protected array $classMap = [
@@ -44,11 +42,9 @@ class CacheCollector extends TimeDataCollector implements AssetProvider, Resetta
         KeyForgetFailed::class => ['forget_failed', ForgettingKey::class],
     ];
 
-    public function __construct(float $requestStartTime, bool $collectValues)
+    public function __construct(float $requestStartTime, protected bool $collectValues)
     {
         parent::__construct($requestStartTime);
-
-        $this->collectValues = $collectValues;
         $this->memoryMeasure = true;
     }
 
@@ -59,7 +55,7 @@ class CacheCollector extends TimeDataCollector implements AssetProvider, Resetta
 
     public function onCacheEvent(CacheEvent|CacheFailedOver|CacheFlushed|CacheFlushFailed|CacheFlushing $event): void
     {
-        $class = get_class($event);
+        $class = $event::class;
         $params = get_object_vars($event);
         $label = $this->classMap[$class][0];
 
@@ -97,7 +93,7 @@ class CacheCollector extends TimeDataCollector implements AssetProvider, Resetta
 
     public function onStartCacheEvent(mixed $event): void
     {
-        $startHashKey = $this->getEventHash(get_class($event), get_object_vars($event));
+        $startHashKey = $this->getEventHash($event::class, get_object_vars($event));
         $this->eventStarts[$startHashKey] = microtime(true);
     }
 

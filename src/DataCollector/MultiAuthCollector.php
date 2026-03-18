@@ -15,17 +15,14 @@ use Illuminate\Contracts\Support\Arrayable;
  */
 class MultiAuthCollector extends DataCollector implements Renderable
 {
-    protected array $guards = [];
-
     /** @var bool */
     protected $showName = false;
 
     /** @var bool */
     protected $showGuardsData = true;
 
-    public function __construct(array $guards = [])
+    public function __construct(protected array $guards = [])
     {
-        $this->guards = $guards;
     }
 
     /**
@@ -67,7 +64,7 @@ class MultiAuthCollector extends DataCollector implements Renderable
                 } else {
                     $data['guards'][$guardName] = null;
                 }
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 continue;
             }
         }
@@ -109,7 +106,7 @@ class MultiAuthCollector extends DataCollector implements Renderable
                 } elseif (isset($user->name)) {
                     $identifier = Str::limit($user->name, 24);
                 }
-            } catch (\Throwable $e) {
+            } catch (\Throwable) {
             }
         }
 

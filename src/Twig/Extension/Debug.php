@@ -12,7 +12,7 @@ use Twig\Environment;
  */
 class Debug extends DebugTwigExtension
 {
-    public function debug(Environment $env, $context)
+    public function debug(Environment $env, $context): void
     {
         if (!$this->messagesCollector) {
             $app = app();

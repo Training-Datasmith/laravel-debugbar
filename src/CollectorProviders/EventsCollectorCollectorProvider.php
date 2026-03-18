@@ -31,7 +31,7 @@ class EventsCollectorCollectorProvider extends AbstractCollectorProvider
 
         $this->addCollector($eventCollector);
 
-        $events->listen('*', function ($event, $data = []) use ($eventCollector): void {
+        $events->listen('*', function (?string $event, array $data = []) use ($eventCollector): void {
             if ($this->debugbar->isEnabled()) {
                 $eventCollector->onWildcardEvent($event, $data);
             }

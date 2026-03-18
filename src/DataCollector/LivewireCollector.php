@@ -22,7 +22,7 @@ class LivewireCollector extends TemplateCollector
         if ((new \ReflectionClass($component))->isAnonymous()) {
             $key = Str::ascii($component->getName()) . ' #' . $id;
         } else {
-            $key = get_class($component) . ' ' . $component->getName() . ' #' . $id;
+            $key = $component::class . ' ' . $component->getName() . ' #' . $id;
         }
 
         if ($request && $request->request->get('id') === $id) {
@@ -31,7 +31,7 @@ class LivewireCollector extends TemplateCollector
         }
 
         $data['#name'] = $component->getName();
-        $data['#component'] = get_class($component);
+        $data['#component'] = $component::class;
         $data['#id'] = $id;
 
         $path = (new \ReflectionClass($component))->getFileName();

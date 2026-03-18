@@ -23,7 +23,7 @@ class CacheCollectorProvider extends AbstractCollectorProvider
 
         $classMap = $cacheCollector->getCacheEvents();
         foreach (array_keys($classMap) as $eventClass) {
-            $events->listen($eventClass, function ($event) use ($cacheCollector): void {
+            $events->listen($eventClass, function (\Illuminate\Cache\Events\CacheEvent|\Illuminate\Cache\Events\CacheFailedOver|\Illuminate\Cache\Events\CacheFlushed|\Illuminate\Cache\Events\CacheFlushFailed|\Illuminate\Cache\Events\CacheFlushing $event) use ($cacheCollector): void {
                 if ($this->debugbar->isEnabled()) {
                     $cacheCollector->onCacheEvent($event);
                 }
@@ -31,7 +31,7 @@ class CacheCollectorProvider extends AbstractCollectorProvider
         }
 
         $startEvents = array_unique(array_filter(array_map(
-            fn($values) => $values[1] ?? null,
+            fn(array $values) => $values[1] ?? null,
             array_values($classMap),
         )));
 

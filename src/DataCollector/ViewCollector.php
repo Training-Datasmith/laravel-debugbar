@@ -33,13 +33,13 @@ class ViewCollector extends TemplateCollector
         }
 
         if (is_object($path)) {
-            $type = get_class($view);
+            $type = $view::class;
             $path = null;
         }
 
         if ($path && $type !== 'livewire') {
             if (!$type) {
-                if (substr($path, -10) === '.blade.php') {
+                if (str_ends_with($path, '.blade.php')) {
                     $type = 'blade';
                 } else {
                     $type = pathinfo($path, PATHINFO_EXTENSION);
@@ -78,7 +78,7 @@ class ViewCollector extends TemplateCollector
             ) {
                 /** @var \Livewire\Component $component */
                 $component = $trace['object'];
-                $name = get_class($component);
+                $name = $component::class;
                 $type = 'livewire';
                 $path = (new \ReflectionClass($component))->getFileName();
                 $component = [$name, $type, [], $path];
@@ -88,7 +88,7 @@ class ViewCollector extends TemplateCollector
                     ($function === 'render' && $class === 'Illuminate\View\Compilers\BladeCompiler')
                     || ($function === '__callStatic' && $class === 'Illuminate\Support\Facades\Facade' && ($trace['args'][0] ?? null) === 'render')
                 )
-                && !str_contains($file, '/Illuminate/')
+                && !str_contains((string) $file, '/Illuminate/')
                 && !$render
             ) {
                 $render = [$name, 'render', [], $file];

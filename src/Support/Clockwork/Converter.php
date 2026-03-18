@@ -9,10 +9,9 @@ class Converter
     /**
      * Convert the phpdebugbar data to Clockwork format.
      *
-     * @param array $data
      *
      */
-    public function convert($data): array
+    public function convert(array $data): array
     {
         $meta = $data['__meta'];
 
@@ -74,7 +73,7 @@ class Converter
 
             $output['controller'] = preg_replace('/<a\b[^>]*>(.*?)<\/a>/i', '', (string) $controller) ?: null;
 
-            [$method, $uri] = explode(' ', $route['uri'], 2);
+            [$method, $uri] = explode(' ', (string) $route['uri'], 2);
 
             $output['routes'][] = [
                 'action' => $output['controller'],
@@ -99,7 +98,10 @@ class Converter
         if (isset($data['queries']['statements'])) {
             $queries = $data['queries'];
             foreach ($queries['statements'] as $statement) {
-                if ($statement['type'] === 'explain' || $statement['type'] === 'info') {
+                if ($statement['type'] === 'explain') {
+                    continue;
+                }
+                if ($statement['type'] === 'info') {
                     continue;
                 }
                 $output['databaseQueries'][] = [
@@ -123,7 +125,7 @@ class Converter
 
             foreach ($data['models']['data'] as $model => $value) {
                 foreach ($value as $event => $count) {
-                    $eventKey = 'models' . ucfirst($event);
+                    $eventKey = 'models' . ucfirst((string) $event);
                     if (isset($output[$eventKey])) {
                         $output[$eventKey][$model] = $count;
                     }

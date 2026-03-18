@@ -172,7 +172,7 @@ class QueryCollector extends DataCollector implements Renderable, AssetProvider,
         if (!$limited && $this->findSource) {
             try {
                 $source = $this->findSource();
-            } catch (\Exception $e) {
+            } catch (\Exception) {
             }
         }
 
@@ -283,7 +283,7 @@ class QueryCollector extends DataCollector implements Renderable, AssetProvider,
         $normalizedPath = str_replace('\\', '/', $file);
 
         foreach ($this->backtraceExcludePaths as $excludedPath) {
-            if (str_contains($normalizedPath, $excludedPath)) {
+            if (str_contains($normalizedPath, (string) $excludedPath)) {
                 return true;
             }
         }
@@ -362,7 +362,7 @@ class QueryCollector extends DataCollector implements Renderable, AssetProvider,
         if ($this->findSource) {
             try {
                 $source = $this->findSource();
-            } catch (\Exception $e) {
+            } catch (\Exception) {
             }
         }
 
@@ -385,7 +385,7 @@ class QueryCollector extends DataCollector implements Renderable, AssetProvider,
         if ($this->findSource) {
             try {
                 $source = $this->findSource();
-            } catch (\Exception $e) {
+            } catch (\Exception) {
             }
         }
 
@@ -445,7 +445,7 @@ class QueryCollector extends DataCollector implements Renderable, AssetProvider,
             $totalMemory += $query['memory'];
 
             $connectionName = $query['connection']->getDatabaseName();
-            if ($connectionName && str_ends_with($connectionName, '.sqlite')) {
+            if ($connectionName && str_ends_with((string) $connectionName, '.sqlite')) {
                 $connectionName = $this->normalizeFilePath($connectionName);
             }
 
@@ -537,8 +537,7 @@ class QueryCollector extends DataCollector implements Renderable, AssetProvider,
         }
 
         $visibleStatements = count($statements) - $this->infoStatements;
-
-        $data = [
+        return [
             'count' => $visibleStatements,
             'nb_statements' => $this->queryCount,
             'nb_visible_statements' => $visibleStatements,
@@ -550,7 +549,6 @@ class QueryCollector extends DataCollector implements Renderable, AssetProvider,
             'memory_usage_str' => $totalMemory ? $this->getDataFormatter()->formatBytes($totalMemory) : null,
             'statements' => $statements,
         ];
-        return $data;
     }
 
     /**
@@ -588,7 +586,7 @@ class QueryCollector extends DataCollector implements Renderable, AssetProvider,
             try {
                 $sql = $grammar->substituteBindingsIntoRawSql($sql, $query['bindings'] ?? []);
                 return $this->getQueryFormatter()->formatSql($sql);
-            } catch (\Throwable $e) {
+            } catch (\Throwable) {
                 // Continue using the old substitute
             }
         }

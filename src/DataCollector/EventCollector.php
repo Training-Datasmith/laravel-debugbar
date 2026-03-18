@@ -34,7 +34,7 @@ class EventCollector extends TimeDataCollector
     public function onWildcardEvent(?string $name = null, array $data = []): void
     {
         $currentTime = microtime(true);
-        $eventClass = explode(':', $name)[0];
+        $eventClass = explode(':', (string) $name)[0];
 
         foreach ($this->excludedEvents as $excludedEvent) {
             if (Str::is($excludedEvent, $eventClass)) {

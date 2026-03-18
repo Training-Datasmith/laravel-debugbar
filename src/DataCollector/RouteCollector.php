@@ -60,7 +60,7 @@ class RouteCollector extends DataCollector implements Renderable
                     $reflector = new \ReflectionClass($component);
                     $controller = $component::class . '@' . $method;
                 }
-            } catch (\Throwable $e) {
+            } catch (\Throwable) {
                 //
             }
         }
@@ -112,9 +112,7 @@ class RouteCollector extends DataCollector implements Renderable
      */
     protected function getMiddleware(mixed $route): string
     {
-        return implode(', ', array_map(function ($middleware): mixed {
-            return $middleware instanceof Closure ? 'Closure' : $middleware;
-        }, $route->gatherMiddleware()));
+        return implode(', ', array_map(fn($middleware): mixed => $middleware instanceof Closure ? 'Closure' : $middleware, $route->gatherMiddleware()));
     }
 
     /**

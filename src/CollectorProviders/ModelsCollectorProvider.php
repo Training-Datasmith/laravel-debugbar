@@ -15,11 +15,11 @@ class ModelsCollectorProvider extends AbstractCollectorProvider
         $this->addCollector($modelsCollector);
 
         $eventList = ['retrieved', 'created', 'updated', 'deleted'];
-        $modelsCollector->setKeyMap(array_combine($eventList, array_map('ucfirst', $eventList)));
+        $modelsCollector->setKeyMap(array_combine($eventList, array_map(ucfirst(...), $eventList)));
         $modelsCollector->collectCountSummary(true);
         foreach ($eventList as $event) {
-            $events->listen("eloquent.{$event}: *", function ($event, $models) use ($modelsCollector): void {
-                $event = explode(': ', $event);
+            $events->listen("eloquent.{$event}: *", function (array $event, $models) use ($modelsCollector): void {
+                $event = explode(': ', (string) $event);
                 $count = count(array_filter($models));
                 $modelsCollector->countClass($event[1], $count, explode('.', $event[0])[1]);
             });
