@@ -1,45 +1,37 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Fruitcake\Laravel_Debugbar\Collector_Providers;
 
-namespace Fruitcake\LaravelDebugbar\CollectorProviders;
-
-use DebugBar\DataCollector\TimeDataCollector;
-use Fruitcake\LaravelDebugbar\DataCollector\HttpClientCollector;
+use Debug_Bar\Data_Collector\Time_Data_Collector;
+use Fruitcake\Laravel_Debugbar\Data_Collector\Http_Client_Collector;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Http\Client\Events\ConnectionFailed;
-use Illuminate\Http\Client\Events\ResponseReceived;
-
-class HttpClientCollectorProvider extends AbstractCollectorProvider
+use Illuminate\Http\Client\Events\Connection_Failed;
+use Illuminate\Http\Client\Events\Response_Received;
+class Http_Client_Collector_Provider extends Abstract_Collector_Provider
 {
-    protected ?HttpClientCollector $httpClientCollector = null;
-
+    protected ?Http_Client_Collector $http_client_collector = null;
     public function __invoke(Dispatcher $events, array $options): void
     {
-        $httpClientCollector = new HttpClientCollector('http_client');
-        if ($this->hasCollector('time') && ($options['timeline'] ?? true)) {
+        $http_client_collector = new Http_Client_Collector('http_client');
+        if ($this->has_collector('time') && ($options['timeline'] ?? true)) {
             /** @var TimeDataCollector   $timeCollector */
-            $timeCollector = $this->getCollector('time');
-            $httpClientCollector->setTimeDataCollector($timeCollector);
+            $time_collector = $this->get_collector('time');
+            $http_client_collector->set_time_data_collector($time_collector);
         }
-
-        $this->httpClientCollector = $httpClientCollector;
-
+        $this->http_client_collector = $http_client_collector;
         $masked = $options['masked'] ?? [];
-        $httpClientCollector->addMaskedKeys($masked);
-
-        $this->addCollector($httpClientCollector);
-
-        $events->listen(ResponseReceived::class, fn (ResponseReceived $e) => $this->addEvent($e));
-        $events->listen(ConnectionFailed::class, fn (ConnectionFailed $e) => $this->addEvent($e));
+        $http_client_collector->add_masked_keys($masked);
+        $this->add_collector($http_client_collector);
+        $events->listen(Response_Received::class, fn(Response_Received $e) => $this->add_event($e));
+        $events->listen(Connection_Failed::class, fn(Connection_Failed $e) => $this->add_event($e));
     }
-
-    protected function addEvent(ResponseReceived|ConnectionFailed $event): void
+    protected function add_event(Response_Received|Connection_Failed $event): void
     {
         try {
-            $this->httpClientCollector->addEvent($event);
+            $this->http_client_collector->add_event($event);
         } catch (\Throwable $e) {
-            $this->addThrowable($e);
+            $this->add_throwable($e);
         }
     }
 }

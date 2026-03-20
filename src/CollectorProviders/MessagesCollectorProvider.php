@@ -1,36 +1,30 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Fruitcake\Laravel_Debugbar\Collector_Providers;
 
-namespace Fruitcake\LaravelDebugbar\CollectorProviders;
-
-class MessagesCollectorProvider extends AbstractCollectorProvider
+class Messages_Collector_Provider extends Abstract_Collector_Provider
 {
     public function __invoke(array $options): void
     {
-        $messageCollector = $this->debugbar->getMessagesCollector();
-        $this->addCollector($messageCollector);
-
+        $message_collector = $this->debugbar->get_messages_collector();
+        $this->add_collector($message_collector);
         if ($options['trace'] ?? true) {
-            $messageCollector->collectFileTrace(true);
-
-            $excludePaths = $options['backtrace_exclude_paths'] ?? [];
-            if ($excludePaths) {
-                $messageCollector->addBacktraceExcludePaths($excludePaths);
+            $message_collector->collect_file_trace(true);
+            $exclude_paths = $options['backtrace_exclude_paths'] ?? [];
+            if ($exclude_paths) {
+                $message_collector->add_backtrace_exclude_paths($exclude_paths);
             }
         }
-
         if ($options['timeline'] ?? true) {
-            $messageCollector->setTimeDataCollector($this->debugbar->getTimeCollector());
+            $message_collector->set_time_data_collector($this->debugbar->get_time_collector());
         }
-
         if ($options['capture_dumps'] ?? false) {
-            $originalHandler = \Symfony\Component\VarDumper\VarDumper::setHandler(function ($var) use (&$originalHandler, $messageCollector): void {
-                if ($originalHandler) {
-                    $originalHandler($var);
+            $original_handler = \Symfony\Component\Var_Dumper\Var_Dumper::set_handler(function ($var) use (&$original_handler, $message_collector): void {
+                if ($original_handler) {
+                    $original_handler($var);
                 }
-
-                $messageCollector->addMessage($var);
+                $message_collector->add_message($var);
             });
         }
     }

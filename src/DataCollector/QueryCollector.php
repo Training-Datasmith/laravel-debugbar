@@ -1,618 +1,420 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Fruitcake\Laravel_Debugbar\Data_Collector;
 
-namespace Fruitcake\LaravelDebugbar\DataCollector;
-
-use DebugBar\DataCollector\AssetProvider;
-use DebugBar\DataCollector\DataCollector;
-use DebugBar\DataCollector\HasTimeDataCollector;
-use DebugBar\DataCollector\Renderable;
-use DebugBar\DataCollector\Resettable;
-use DebugBar\DataFormatter\QueryFormatter;
-use Fruitcake\LaravelDebugbar\Support\Explain;
-use Illuminate\Database\Events\QueryExecuted;
+use Debug_Bar\Data_Collector\Asset_Provider;
+use Debug_Bar\Data_Collector\Data_Collector;
+use Debug_Bar\Data_Collector\Has_Time_Data_Collector;
+use Debug_Bar\Data_Collector\Renderable;
+use Debug_Bar\Data_Collector\Resettable;
+use Debug_Bar\Data_Formatter\Query_Formatter;
+use Fruitcake\Laravel_Debugbar\Support\Explain;
+use Illuminate\Database\Events\Query_Executed;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Support\Str;
-
 /**
  * Collects data about SQL statements executed with PDO
  */
-class QueryCollector extends DataCollector implements Renderable, AssetProvider, Resettable
+class Query_Collector extends Data_Collector implements Renderable, Asset_Provider, Resettable
 {
-    use HasTimeDataCollector;
-
+    use Has_Time_Data_Collector;
     protected array $queries = [];
-    protected int $queryCount = 0;
-    protected int $transactionEventsCount = 0;
-    protected int $infoStatements = 0;
-    protected ?int $softLimit = null;
-    protected ?int $hardLimit = null;
-    protected ?int $lastMemoryUsage = null;
-    protected bool|int $findSource = false;
+    protected int $query_count = 0;
+    protected int $transaction_events_count = 0;
+    protected int $info_statements = 0;
+    protected ?int $soft_limit = null;
+    protected ?int $hard_limit = null;
+    protected ?int $last_memory_usage = null;
+    protected bool|int $find_source = false;
     protected array $middleware = [];
-    protected bool $explainQuery = false;
-    protected bool $showQueryResult = false;
+    protected bool $explain_query = false;
+    protected bool $show_query_result = false;
     protected array $reflection = [];
-    protected array $excludePaths = [];
-    protected array $backtraceExcludePaths = [
-        '/vendor/laravel/framework/src/Illuminate/Support',
-        '/vendor/laravel/framework/src/Illuminate/Database',
-        '/vendor/laravel/framework/src/Illuminate/Events',
-        '/vendor/laravel/framework/src/Illuminate/Collections',
-        '/vendor/october/rain',
-        '/vendor/barryvdh/laravel-debugbar',
-        '/vendor/fruitcake/laravel-debugbar',
-    ];
-
-    protected ?QueryFormatter $queryFormatter = null;
-    protected bool $renderSqlWithParams = false;
-    protected bool $durationBackground = false;
-    protected ?float $slowThreshold = null;
-
-    public function getQueryFormatter(): QueryFormatter
+    protected array $exclude_paths = [];
+    protected array $backtrace_exclude_paths = ['/vendor/laravel/framework/src/Illuminate/Support', '/vendor/laravel/framework/src/Illuminate/Database', '/vendor/laravel/framework/src/Illuminate/Events', '/vendor/laravel/framework/src/Illuminate/Collections', '/vendor/october/rain', '/vendor/barryvdh/laravel-debugbar', '/vendor/fruitcake/laravel-debugbar'];
+    protected ?Query_Formatter $query_formatter = null;
+    protected bool $render_sql_with_params = false;
+    protected bool $duration_background = false;
+    protected ?float $slow_threshold = null;
+    public function get_query_formatter(): Query_Formatter
     {
-        if ($this->queryFormatter === null) {
-            $this->queryFormatter = new QueryFormatter();
+        if ($this->query_formatter === null) {
+            $this->query_formatter = new Query_Formatter();
         }
-        return $this->queryFormatter;
+        return $this->query_formatter;
     }
-
     /**
      * @param int|null $softLimit After the soft limit, no parameters/backtrace are captured
      * @param int|null $hardLimit After the hard limit, queries are ignored
      */
-    public function setLimits(?int $softLimit, ?int $hardLimit): void
+    public function set_limits(?int $soft_limit, ?int $hard_limit): void
     {
-        $this->softLimit = $softLimit;
-        $this->hardLimit = $hardLimit;
+        $this->soft_limit = $soft_limit;
+        $this->hard_limit = $hard_limit;
     }
-
     /**
      * Renders the SQL of traced statements with params embedded
      */
-    public function setRenderSqlWithParams(bool $enabled = true): void
+    public function set_render_sql_with_params(bool $enabled = true): void
     {
-        $this->renderSqlWithParams = $enabled;
+        $this->render_sql_with_params = $enabled;
     }
-
     /**
      * Enable/disable finding the source
      */
-    public function setFindSource(bool|int $value, array $middleware): void
+    public function set_find_source(bool|int $value, array $middleware): void
     {
-        $this->findSource = $value;
+        $this->find_source = $value;
         $this->middleware = $middleware;
     }
-
-    public function mergeExcludePaths(array $excludePaths): void
+    public function merge_exclude_paths(array $exclude_paths): void
     {
-        $this->excludePaths = array_merge($this->excludePaths, $excludePaths);
+        $this->exclude_paths = array_merge($this->exclude_paths, $exclude_paths);
     }
-
     /**
      * Set additional paths to exclude from the backtrace
      */
-    public function mergeBacktraceExcludePaths(array $excludePaths): void
+    public function merge_backtrace_exclude_paths(array $exclude_paths): void
     {
-        $this->backtraceExcludePaths = array_merge($this->backtraceExcludePaths, $excludePaths);
+        $this->backtrace_exclude_paths = array_merge($this->backtrace_exclude_paths, $exclude_paths);
     }
-
     /**
      * Enable/disable the shaded duration background on queries
      */
-    public function setDurationBackground(bool $enabled): void
+    public function set_duration_background(bool $enabled): void
     {
-        $this->durationBackground = $enabled;
+        $this->duration_background = $enabled;
     }
-
     /**
      * Highlights queries that exceed the threshold
      *
      * @param int|float $threshold miliseconds value
      */
-    public function setSlowThreshold(int|float $threshold): void
+    public function set_slow_threshold(int|float $threshold): void
     {
-        $this->slowThreshold = $threshold / 1000;
+        $this->slow_threshold = $threshold / 1000;
     }
-
-    public function isSqlRenderedWithParams(): bool
+    public function is_sql_rendered_with_params(): bool
     {
-        return $this->renderSqlWithParams;
+        return $this->render_sql_with_params;
     }
-
     /**
      * Enable/disable the EXPLAIN queries
      *
      * @deprecated use setExplainQuery()
      */
-    public function setExplainSource(bool $enabled): void
+    public function set_explain_source(bool $enabled): void
     {
-        $this->setExplainQuery($enabled);
+        $this->set_explain_query($enabled);
     }
-
     /**
      * Enable/disable the EXPLAIN queries
      */
-    public function setExplainQuery(bool $enabled): void
+    public function set_explain_query(bool $enabled): void
     {
-        $this->explainQuery = $enabled;
+        $this->explain_query = $enabled;
     }
-
     /**
      * Enable/disable the EXPLAIN queries
      */
-    public function setShowQueryResult(bool $enabled): void
+    public function set_show_query_result(bool $enabled): void
     {
-        $this->showQueryResult = $enabled;
+        $this->show_query_result = $enabled;
     }
-
-    public function startMemoryUsage(): void
+    public function start_memory_usage(): void
     {
-        $this->lastMemoryUsage = memory_get_usage(false);
+        $this->last_memory_usage = memory_get_usage(false);
     }
-
-    public function addQuery(QueryExecuted $query): void
+    public function add_query(Query_Executed $query): void
     {
-        $this->queryCount++;
-
-        if ($this->hardLimit && $this->queryCount > $this->hardLimit) {
+        $this->query_count++;
+        if ($this->hard_limit && $this->query_count > $this->hard_limit) {
             return;
         }
-
-        $limited = $this->softLimit && $this->queryCount > $this->softLimit;
-
+        $limited = $this->soft_limit && $this->query_count > $this->soft_limit;
         $sql = $query->sql;
         $time = $query->time / 1000;
-        $endTime = microtime(true);
-        $startTime = $endTime - $time;
-
+        $end_time = microtime(true);
+        $start_time = $end_time - $time;
         $source = [];
-
-        if (!$limited && $this->findSource) {
+        if (!$limited && $this->find_source) {
             try {
-                $source = $this->findSource();
+                $source = $this->find_source();
             } catch (\Exception) {
             }
         }
-
         $bindings = match (true) {
             $limited && filled($query->bindings) => null,
-            default => $query->connection->prepareBindings($query->bindings),
+            default => $query->connection->prepare_bindings($query->bindings),
         };
-
-        $this->queries[] = [
-            'query' => $sql,
-            'type' => 'query',
-            'bindings' => $bindings,
-            'start' => $startTime,
-            'time' => $time,
-            'memory' => $this->lastMemoryUsage ? memory_get_usage(false) - $this->lastMemoryUsage : 0,
-            'source' => $source,
-            'connection' => $query->connection,
-            'driver' => $query->connection->getConfig('driver'),
-        ];
-
-        if ($this->hasTimeDataCollector()) {
-            $this->addTimeMeasure(Str::limit($sql, 100), $startTime, $endTime, [], 'Database Query');
+        $this->queries[] = ['query' => $sql, 'type' => 'query', 'bindings' => $bindings, 'start' => $start_time, 'time' => $time, 'memory' => $this->last_memory_usage ? memory_get_usage(false) - $this->last_memory_usage : 0, 'source' => $source, 'connection' => $query->connection, 'driver' => $query->connection->get_config('driver')];
+        if ($this->has_time_data_collector()) {
+            $this->add_time_measure(Str::limit($sql, 100), $start_time, $end_time, [], 'Database Query');
         }
     }
-
     /**
      * Use a backtrace to search for the origins of the query.
      */
-    protected function findSource(): array
+    protected function find_source(): array
     {
         $stack = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS | DEBUG_BACKTRACE_PROVIDE_OBJECT, app('config')->get('debugbar.debug_backtrace_limit', 50));
-
         $sources = [];
-
         foreach ($stack as $index => $trace) {
-            $sources[] = $this->parseTrace($index, $trace);
+            $sources[] = $this->parse_trace($index, $trace);
         }
-
-        return array_slice(array_filter($sources), 0, is_int($this->findSource) ? $this->findSource : 5);
+        return array_slice(array_filter($sources), 0, is_int($this->find_source) ? $this->find_source : 5);
     }
-
     /**
      * Parse a trace element from the backtrace stack.
      */
-    protected function parseTrace(int $index, array $trace): object|bool
+    protected function parse_trace(int $index, array $trace): object|bool
     {
-        $frame = (object) [
-            'index' => $index,
-            'namespace' => null,
-            'name' => null,
-            'file' => null,
-            'line' => $trace['line'] ?? '1',
-        ];
-
+        $frame = (object) ['index' => $index, 'namespace' => null, 'name' => null, 'file' => null, 'line' => $trace['line'] ?? '1'];
         if (isset($trace['function']) && $trace['function'] === 'substituteBindings') {
             $frame->name = 'Route binding';
-
             return $frame;
         }
-
-        if (
-            isset($trace['class'])
-            && isset($trace['file'])
-            && !$this->fileIsInExcludedPath($trace['file'])
-        ) {
+        if (isset($trace['class']) && isset($trace['file']) && !$this->file_is_in_excluded_path($trace['file'])) {
             $frame->file = $trace['file'];
-
             if (isset($trace['object']) && is_a($trace['object'], '\Twig\Template')) {
-                [$frame->file, $frame->line] = $this->getTwigInfo($trace);
+                [$frame->file, $frame->line] = $this->get_twig_info($trace);
             } elseif (str_contains($frame->file, storage_path())) {
                 $hash = pathinfo($frame->file, PATHINFO_FILENAME);
-
-                if ($frame->name = $this->findViewFromHash($hash)) {
+                if ($frame->name = $this->find_view_from_hash($hash)) {
                     $frame->file = $frame->name[1];
                     $frame->name = $frame->name[0];
                 } else {
                     $frame->name = $hash;
                 }
-
                 $frame->namespace = 'view';
-
                 return $frame;
             } elseif (str_contains($frame->file, 'Middleware')) {
-                $frame->name = $this->findMiddlewareFromFile($frame->file);
-
+                $frame->name = $this->find_middleware_from_file($frame->file);
                 if ($frame->name) {
                     $frame->namespace = 'middleware';
                 } else {
-                    $frame->name = $this->normalizeFilePath($frame->file);
+                    $frame->name = $this->normalize_file_path($frame->file);
                 }
-
                 return $frame;
             }
-
-            $frame->name = $this->normalizeFilePath($frame->file);
-
+            $frame->name = $this->normalize_file_path($frame->file);
             return $frame;
         }
-
         return false;
     }
-
     /**
      * Check if the given file is to be excluded from analysis
      */
-    protected function fileIsInExcludedPath(string $file): bool
+    protected function file_is_in_excluded_path(string $file): bool
     {
-        $normalizedPath = str_replace('\\', '/', $file);
-
-        foreach ($this->backtraceExcludePaths as $excludedPath) {
-            if (str_contains($normalizedPath, (string) $excludedPath)) {
+        $normalized_path = str_replace('\\', '/', $file);
+        foreach ($this->backtrace_exclude_paths as $excluded_path) {
+            if (str_contains($normalized_path, (string) $excluded_path)) {
                 return true;
             }
         }
-
         return false;
     }
-
     /**
      * Find the middleware alias from the file.
      */
-    protected function findMiddlewareFromFile(string $file): ?string
+    protected function find_middleware_from_file(string $file): ?string
     {
         $filename = pathinfo($file, PATHINFO_FILENAME);
-
         foreach ($this->middleware as $alias => $class) {
             if (is_string($class) && str_contains($class, $filename)) {
                 return $alias;
             }
         }
-
         return null;
     }
-
     /**
      * Find the template name from the hash.
      */
-    protected function findViewFromHash(string $hash): ?array
+    protected function find_view_from_hash(string $hash): ?array
     {
-        $finder = app('view')->getFinder();
-
+        $finder = app('view')->get_finder();
         if (isset($this->reflection['viewfinderViews'])) {
             $property = $this->reflection['viewfinderViews'];
         } else {
             $reflection = new \ReflectionClass($finder);
-            $property = $reflection->getProperty('views');
+            $property = $reflection->get_property('views');
             $this->reflection['viewfinderViews'] = $property;
         }
-
         $xxh128Exists = in_array('xxh128', hash_algos(), true);
-
-        foreach ($property->getValue($finder) as $name => $path) {
-            if (($xxh128Exists && hash('xxh128', 'v2' . $path) === $hash) || sha1('v2' . $path) === $hash) {
+        foreach ($property->get_value($finder) as $name => $path) {
+            if ($xxh128Exists && hash('xxh128', 'v2' . $path) === $hash || sha1('v2' . $path) === $hash) {
                 return [$name, $path];
             }
         }
-
         return null;
     }
-
     /**
      * Get the filename/line from a Twig template trace
      */
-    protected function getTwigInfo(array $trace): array
+    protected function get_twig_info(array $trace): array
     {
-        $file = $trace['object']->getTemplateName();
-
+        $file = $trace['object']->get_template_name();
         if (isset($trace['line'])) {
-            foreach ($trace['object']->getDebugInfo() as $codeLine => $templateLine) {
-                if ($codeLine <= $trace['line']) {
-                    return [$file, $templateLine];
+            foreach ($trace['object']->get_debug_info() as $code_line => $template_line) {
+                if ($code_line <= $trace['line']) {
+                    return [$file, $template_line];
                 }
             }
         }
-
         return [$file, -1];
     }
-
     /**
      * Adds a custom message to statements.
      */
-    public function addMessage(string $message): void
+    public function add_message(string $message): void
     {
-        $this->infoStatements++;
+        $this->info_statements++;
         $source = [];
-
-        if ($this->findSource) {
+        if ($this->find_source) {
             try {
-                $source = $this->findSource();
+                $source = $this->find_source();
             } catch (\Exception) {
             }
         }
-
-        $this->queries[] = [
-            'sql' => $message,
-            'type' => 'message',
-            'start' => microtime(true),
-            ...(count($source) ? ['xdebug_link' => $source[0]] : []),
-        ];
+        $this->queries[] = ['sql' => $message, 'type' => 'message', 'start' => microtime(true), ...count($source) ? ['xdebug_link' => $source[0]] : []];
     }
-
     /**
      * Collect a database transaction event.
      */
-    public function collectTransactionEvent(string $event, mixed $connection): void
+    public function collect_transaction_event(string $event, mixed $connection): void
     {
-        $this->transactionEventsCount++;
+        $this->transaction_events_count++;
         $source = [];
-
-        if ($this->findSource) {
+        if ($this->find_source) {
             try {
-                $source = $this->findSource();
+                $source = $this->find_source();
             } catch (\Exception) {
             }
         }
-
-        $this->queries[] = [
-            'query' => $event,
-            'type' => 'transaction',
-            'bindings' => [],
-            'start' => microtime(true),
-            'time' => 0,
-            'memory' => 0,
-            'source' => $source,
-            'connection' => $connection,
-            'driver' => $connection->getConfig('driver'),
-        ];
+        $this->queries[] = ['query' => $event, 'type' => 'transaction', 'bindings' => [], 'start' => microtime(true), 'time' => 0, 'memory' => 0, 'source' => $source, 'connection' => $connection, 'driver' => $connection->get_config('driver')];
     }
-
     /**
      * Reset the queries.
      */
     public function reset(): void
     {
         $this->queries = [];
-        $this->queryCount = 0;
-        $this->infoStatements = 0 ;
-        $this->transactionEventsCount = 0;
+        $this->query_count = 0;
+        $this->info_statements = 0;
+        $this->transaction_events_count = 0;
         $this->reflection = [];
     }
-
     /**
      * {@inheritDoc}
      */
     public function collect(): array
     {
-        $totalTime = 0;
-        $totalMemory = 0;
+        $total_time = 0;
+        $total_memory = 0;
         $queries = $this->queries;
-
         $statements = [];
-        $explain = (new Explain());
+        $explain = new Explain();
         foreach ($queries as $query) {
             if ($query['type'] === 'message') {
                 if (isset($query['xdebug_link'])) {
                     $source = $query['xdebug_link'];
-                    $query['xdebug_link'] = $this->getXdebugLink($source->file ?: '', $source->line);
+                    $query['xdebug_link'] = $this->get_xdebug_link($source->file ?: '', $source->line);
                 }
                 $statements[] = $query;
                 continue;
             }
-
             $source = reset($query['source']);
-            $normalizedPath = is_object($source) ? $this->normalizeFilePath($source->file ?: '') : '';
-            if ($query['type'] !== 'transaction' && Str::startsWith($normalizedPath, $this->excludePaths)) {
+            $normalized_path = is_object($source) ? $this->normalize_file_path($source->file ?: '') : '';
+            if ($query['type'] !== 'transaction' && Str::starts_with($normalized_path, $this->exclude_paths)) {
                 continue;
             }
-
-            $totalTime += $query['time'];
-            $totalMemory += $query['memory'];
-
-            $connectionName = $query['connection']->getDatabaseName();
-            if ($connectionName && str_ends_with((string) $connectionName, '.sqlite')) {
-                $connectionName = $this->normalizeFilePath($connectionName);
+            $total_time += $query['time'];
+            $total_memory += $query['memory'];
+            $connection_name = $query['connection']->get_database_name();
+            if ($connection_name && str_ends_with((string) $connection_name, '.sqlite')) {
+                $connection_name = $this->normalize_file_path($connection_name);
             }
-
-            $explainModes = [];
-            $isReadonly = $explain->isReadOnlyQuery($query['query'] ?? '');
-            $canRunQuery = $this->showQueryResult && $isReadonly;
-            if ($canRunQuery) {
-                $explainModes[] = 'result';
+            $explain_modes = [];
+            $is_readonly = $explain->is_read_only_query($query['query'] ?? '');
+            $can_run_query = $this->show_query_result && $is_readonly;
+            if ($can_run_query) {
+                $explain_modes[] = 'result';
             }
-
-            if ($isReadonly && $this->explainQuery && $explain->isRawExplainSupported($query['driver'], $query['bindings'])) {
-                $explainModes[] = 'explain';
+            if ($is_readonly && $this->explain_query && $explain->is_raw_explain_supported($query['driver'], $query['bindings'])) {
+                $explain_modes[] = 'explain';
             }
-
-            $statements[] = [
-                'sql' => $this->getSqlQueryToDisplay($query),
-                'type' => $query['type'],
-                'params' => $query['bindings'] ?? [],
-                'backtrace' => array_values($query['source']),
-                'start' => $query['start'] ?? null,
-                'duration' => $query['time'],
-                'duration_str' => ($query['type'] === 'transaction') ? '' : $this->getDataFormatter()->formatDuration($query['time']),
-                'slow' => $this->slowThreshold && $this->slowThreshold <= $query['time'],
-                'memory' => $query['memory'],
-                'memory_str' => $query['memory'] ? $this->getDataFormatter()->formatBytes($query['memory']) : null,
-                'filename' => $source ? $this->getQueryFormatter()->formatSource($source, true) : null,
-                'source' => $source,
-                'xdebug_link' => is_object($source) ? $this->getXdebugLink($source->file ?: '', $source->line) : null,
-                'connection' => $connectionName,
-                'explain' => $explainModes ? [
-                    'url' => route('debugbar.queries.explain'),
-                    'driver' => $query['driver'],
-                    'connection' => $query['connection']->getName(),
-                    'query' => $query['query'],
-                    'modes' => $explainModes,
-                    'hash' => $explain->hash($query['connection']->getName(), $query['query'], $query['bindings']),
-                ] : null,
-            ];
+            $statements[] = ['sql' => $this->get_sql_query_to_display($query), 'type' => $query['type'], 'params' => $query['bindings'] ?? [], 'backtrace' => array_values($query['source']), 'start' => $query['start'] ?? null, 'duration' => $query['time'], 'duration_str' => $query['type'] === 'transaction' ? '' : $this->get_data_formatter()->format_duration($query['time']), 'slow' => $this->slow_threshold && $this->slow_threshold <= $query['time'], 'memory' => $query['memory'], 'memory_str' => $query['memory'] ? $this->get_data_formatter()->format_bytes($query['memory']) : null, 'filename' => $source ? $this->get_query_formatter()->format_source($source, true) : null, 'source' => $source, 'xdebug_link' => is_object($source) ? $this->get_xdebug_link($source->file ?: '', $source->line) : null, 'connection' => $connection_name, 'explain' => $explain_modes ? ['url' => route('debugbar.queries.explain'), 'driver' => $query['driver'], 'connection' => $query['connection']->get_name(), 'query' => $query['query'], 'modes' => $explain_modes, 'hash' => $explain->hash($query['connection']->get_name(), $query['query'], $query['bindings'])] : null];
         }
-
-        if ($this->durationBackground) {
-            if ($totalTime > 0) {
+        if ($this->duration_background) {
+            if ($total_time > 0) {
                 // For showing background measure on Queries tab
                 $start_percent = 0;
-
                 foreach ($statements as $i => $statement) {
                     if (!isset($statement['duration'])) {
                         continue;
                     }
-
-                    $width_percent = $statement['duration'] / $totalTime * 100;
-
-                    $statements[$i] = array_merge($statement, [
-                        'start_percent' => round($start_percent, 3),
-                        'width_percent' => round($width_percent, 3),
-                    ]);
-
+                    $width_percent = $statement['duration'] / $total_time * 100;
+                    $statements[$i] = array_merge($statement, ['start_percent' => round($start_percent, 3), 'width_percent' => round($width_percent, 3)]);
                     $start_percent += $width_percent;
                 }
             }
         }
-
-        if ($this->softLimit && $this->hardLimit && ($this->queryCount > $this->softLimit && $this->queryCount > $this->hardLimit)) {
-            array_unshift($statements, [
-                'sql' => '# Query soft and hard limit for Debugbar are reached. Only the first ' . $this->softLimit . ' queries show details. Queries after the first ' . $this->hardLimit . ' are ignored. Limits can be raised in the config (debugbar.options.db.soft/hard_limit).',
-                'type' => 'info',
-            ]);
-            $statements[] = [
-                'sql' => '... ' . ($this->queryCount - $this->hardLimit) . ' additional queries are executed but now shown because of Debugbar query limits. Limits can be raised in the config (debugbar.options.db.soft/hard_limit)',
-                'type' => 'info',
-            ];
-            $this->infoStatements += 2;
-        } elseif ($this->hardLimit && $this->queryCount > $this->hardLimit) {
-            array_unshift($statements, [
-                'sql' => '# Query hard limit for Debugbar is reached after ' . $this->hardLimit . ' queries, additional ' . ($this->queryCount - $this->hardLimit) . ' queries are not shown.. Limits can be raised in the config (debugbar.options.db.hard_limit)',
-                'type' => 'info',
-            ]);
-            $statements[] = [
-                'sql' => '... ' . ($this->queryCount - $this->hardLimit) . ' additional queries are executed but now shown because of Debugbar query limits. Limits can be raised in the config (debugbar.options.db.hard_limit)',
-                'type' => 'info',
-            ];
-            $this->infoStatements += 2;
-        } elseif ($this->softLimit && $this->queryCount > $this->softLimit) {
-            array_unshift($statements, [
-                'sql' => '# Query soft limit for Debugbar is reached after ' . $this->softLimit . ' queries, additional ' . ($this->queryCount - $this->softLimit) . ' queries only show the query. Limits can be raised in the config (debugbar.options.db.soft_limit)',
-                'type' => 'info',
-            ]);
-            $this->infoStatements++;
+        if ($this->soft_limit && $this->hard_limit && ($this->query_count > $this->soft_limit && $this->query_count > $this->hard_limit)) {
+            array_unshift($statements, ['sql' => '# Query soft and hard limit for Debugbar are reached. Only the first ' . $this->soft_limit . ' queries show details. Queries after the first ' . $this->hard_limit . ' are ignored. Limits can be raised in the config (debugbar.options.db.soft/hard_limit).', 'type' => 'info']);
+            $statements[] = ['sql' => '... ' . ($this->query_count - $this->hard_limit) . ' additional queries are executed but now shown because of Debugbar query limits. Limits can be raised in the config (debugbar.options.db.soft/hard_limit)', 'type' => 'info'];
+            $this->info_statements += 2;
+        } elseif ($this->hard_limit && $this->query_count > $this->hard_limit) {
+            array_unshift($statements, ['sql' => '# Query hard limit for Debugbar is reached after ' . $this->hard_limit . ' queries, additional ' . ($this->query_count - $this->hard_limit) . ' queries are not shown.. Limits can be raised in the config (debugbar.options.db.hard_limit)', 'type' => 'info']);
+            $statements[] = ['sql' => '... ' . ($this->query_count - $this->hard_limit) . ' additional queries are executed but now shown because of Debugbar query limits. Limits can be raised in the config (debugbar.options.db.hard_limit)', 'type' => 'info'];
+            $this->info_statements += 2;
+        } elseif ($this->soft_limit && $this->query_count > $this->soft_limit) {
+            array_unshift($statements, ['sql' => '# Query soft limit for Debugbar is reached after ' . $this->soft_limit . ' queries, additional ' . ($this->query_count - $this->soft_limit) . ' queries only show the query. Limits can be raised in the config (debugbar.options.db.soft_limit)', 'type' => 'info']);
+            $this->info_statements++;
         }
-
-        $visibleStatements = count($statements) - $this->infoStatements;
-        return [
-            'count' => $visibleStatements,
-            'nb_statements' => $this->queryCount,
-            'nb_visible_statements' => $visibleStatements,
-            'nb_excluded_statements' => $this->queryCount + $this->transactionEventsCount - $visibleStatements,
-            'nb_failed_statements' => 0,
-            'accumulated_duration' => $totalTime,
-            'accumulated_duration_str' => $this->getDataFormatter()->formatDuration($totalTime),
-            'memory_usage' => $totalMemory,
-            'memory_usage_str' => $totalMemory ? $this->getDataFormatter()->formatBytes($totalMemory) : null,
-            'statements' => $statements,
-        ];
+        $visible_statements = count($statements) - $this->info_statements;
+        return ['count' => $visible_statements, 'nb_statements' => $this->query_count, 'nb_visible_statements' => $visible_statements, 'nb_excluded_statements' => $this->query_count + $this->transaction_events_count - $visible_statements, 'nb_failed_statements' => 0, 'accumulated_duration' => $total_time, 'accumulated_duration_str' => $this->get_data_formatter()->format_duration($total_time), 'memory_usage' => $total_memory, 'memory_usage_str' => $total_memory ? $this->get_data_formatter()->format_bytes($total_memory) : null, 'statements' => $statements];
     }
-
     /**
      * {@inheritDoc}
      */
-    public function getName(): string
+    public function get_name(): string
     {
         return 'queries';
     }
-
     /**
      * {@inheritDoc}
      */
-    public function getWidgets(): array
+    public function get_widgets(): array
     {
-        return [
-            'queries' => [
-                'icon' => 'database',
-                'widget' => 'PhpDebugBar.Widgets.LaravelQueriesWidget',
-                'map' => 'queries',
-                'default' => '[]',
-            ],
-            'queries:badge' => [
-                'map' => 'queries.nb_statements',
-                'default' => 0,
-            ],
-        ];
+        return ['queries' => ['icon' => 'database', 'widget' => 'PhpDebugBar.Widgets.LaravelQueriesWidget', 'map' => 'queries', 'default' => '[]'], 'queries:badge' => ['map' => 'queries.nb_statements', 'default' => 0]];
     }
-
-    protected function getSqlQueryToDisplay(array $query): string
+    protected function get_sql_query_to_display(array $query): string
     {
         $sql = $query['query'];
-        $grammar = $query['connection']->getQueryGrammar();
+        $grammar = $query['connection']->get_query_grammar();
         if ($query['type'] === 'query' && $grammar instanceof Grammar) {
             try {
-                $sql = $grammar->substituteBindingsIntoRawSql($sql, $query['bindings'] ?? []);
-                return $this->getQueryFormatter()->formatSql($sql);
+                $sql = $grammar->substitute_bindings_into_raw_sql($sql, $query['bindings'] ?? []);
+                return $this->get_query_formatter()->format_sql($sql);
             } catch (\Throwable) {
                 // Continue using the old substitute
             }
         }
-
-        if ($query['type'] === 'query' && $this->renderSqlWithParams) {
+        if ($query['type'] === 'query' && $this->render_sql_with_params) {
             $pdo = null;
             try {
-                $pdo = $query['connection']->getPdo();
+                $pdo = $query['connection']->get_pdo();
             } catch (\Throwable) {
                 // ignore error for non-pdo laravel drivers
             }
-
-            $sql = $this->getQueryFormatter()->formatSqlWithBindings($sql, $query['bindings'] ?? [], $pdo);
+            $sql = $this->get_query_formatter()->format_sql_with_bindings($sql, $query['bindings'] ?? [], $pdo);
         }
-
-        return $this->getQueryFormatter()->formatSql($sql);
+        return $this->get_query_formatter()->format_sql($sql);
     }
-
-    public function getAssets(): array
+    public function get_assets(): array
     {
-        return [
-            'js' => [
-                'widgets/sqlqueries/widget.js',
-                __DIR__ . '/../../resources/queries/widget.js',
-            ],
-            'css' => 'widgets/sqlqueries/widget.css',
-        ];
+        return ['js' => ['widgets/sqlqueries/widget.js', __DIR__ . '/../../resources/queries/widget.js'], 'css' => 'widgets/sqlqueries/widget.css'];
     }
 }

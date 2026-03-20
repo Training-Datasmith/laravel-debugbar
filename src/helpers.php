@@ -1,23 +1,20 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 if (!function_exists('debugbar')) {
     /**
      * Get the Debugbar instance
      *
      */
-    function debugbar(?string $collector = null): \Fruitcake\LaravelDebugbar\LaravelDebugbar|\DebugBar\DataCollector\DataCollectorInterface|null
+    function debugbar(?string $collector = null): \Fruitcake\Laravel_Debugbar\Laravel_Debugbar|\Debug_Bar\Data_Collector\Data_Collector_Interface|null
     {
-        $debugbar = app(\Fruitcake\LaravelDebugbar\LaravelDebugbar::class);
+        $debugbar = app(\Fruitcake\Laravel_Debugbar\Laravel_Debugbar::class);
         if ($collector) {
-            return $debugbar->hasCollector($collector) ? $debugbar->getCollector($collector) : null;
+            return $debugbar->has_collector($collector) ? $debugbar->get_collector($collector) : null;
         }
-
         return $debugbar;
     }
 }
-
 if (!function_exists('debug')) {
     /**
      * Adds one or more messages to the MessagesCollector
@@ -27,7 +24,7 @@ if (!function_exists('debug')) {
     {
         $debugbar = debugbar();
         foreach ($value as $message) {
-            $debugbar->addMessage($message, 'debug');
+            $debugbar->add_message($message, 'debug');
         }
     }
 }

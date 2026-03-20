@@ -1,29 +1,24 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Fruitcake\Laravel_Debugbar\Collector_Providers;
 
-namespace Fruitcake\LaravelDebugbar\CollectorProviders;
-
-use Fruitcake\LaravelDebugbar\DataCollector\GateCollector;
-use Illuminate\Auth\Access\Events\GateEvaluated;
+use Fruitcake\Laravel_Debugbar\Data_Collector\Gate_Collector;
+use Illuminate\Auth\Access\Events\Gate_Evaluated;
 use Illuminate\Contracts\Events\Dispatcher;
-
-class GateCollectorProvider extends AbstractCollectorProvider
+class Gate_Collector_Provider extends Abstract_Collector_Provider
 {
     public function __invoke(Dispatcher $events, array $options): void
     {
-        $gateCollector = new GateCollector('gate');
-        $this->addCollector($gateCollector);
-
+        $gate_collector = new Gate_Collector('gate');
+        $this->add_collector($gate_collector);
         if ($options['trace'] ?? false) {
-            $gateCollector->collectFileTrace(true);
-            $gateCollector->addBacktraceExcludePaths($options['exclude_paths'] ?? []);
+            $gate_collector->collect_file_trace(true);
+            $gate_collector->add_backtrace_exclude_paths($options['exclude_paths'] ?? []);
         }
-
         if ($options['timeline'] ?? false) {
-            $gateCollector->setTimeDataCollector($this->debugbar->getTimeCollector());
+            $gate_collector->set_time_data_collector($this->debugbar->get_time_collector());
         }
-
-        $events->listen(GateEvaluated::class, fn (GateEvaluated $event) => $gateCollector->addCheck($event->user, $event->ability, $event->result, $event->arguments));
+        $events->listen(Gate_Evaluated::class, fn(Gate_Evaluated $event) => $gate_collector->add_check($event->user, $event->ability, $event->result, $event->arguments));
     }
 }

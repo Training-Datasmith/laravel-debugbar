@@ -1,25 +1,21 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Fruitcake\Laravel_Debugbar\Collector_Providers;
 
-namespace Fruitcake\LaravelDebugbar\CollectorProviders;
-
-use DebugBar\DataCollector\MemoryCollector;
-
-class MemoryCollectorProvider extends AbstractCollectorProvider
+use Debug_Bar\Data_Collector\Memory_Collector;
+class Memory_Collector_Provider extends Abstract_Collector_Provider
 {
     public function __invoke(array $options): void
     {
-        $memoryCollector = new MemoryCollector();
-        $this->addCollector($memoryCollector);
-        $memoryCollector->setPrecision($options['precision'] ?? 0);
-
+        $memory_collector = new Memory_Collector();
+        $this->add_collector($memory_collector);
+        $memory_collector->set_precision($options['precision'] ?? 0);
         if (function_exists('memory_reset_peak_usage') && ($options['reset_peak_usage'] ?? false)) {
             memory_reset_peak_usage();
         }
-
         if ($options['with_baseline'] ?? false) {
-            $memoryCollector->resetMemoryBaseline();
+            $memory_collector->reset_memory_baseline();
         }
     }
 }

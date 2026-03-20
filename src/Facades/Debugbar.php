@@ -1,12 +1,10 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Fruitcake\Laravel_Debugbar\Facades;
 
-namespace Fruitcake\LaravelDebugbar\Facades;
-
-use DebugBar\DataCollector\DataCollectorInterface;
-use Fruitcake\LaravelDebugbar\LaravelDebugbar;
-
+use Debug_Bar\Data_Collector\Data_Collector_Interface;
+use Fruitcake\Laravel_Debugbar\Laravel_Debugbar;
 /**
  * @method static LaravelDebugbar addCollector(DataCollectorInterface $collector)
  * @method static void            addMessage(mixed $message, string $label = 'info')
@@ -29,8 +27,8 @@ class Debugbar extends \Illuminate\Support\Facades\Facade
     /**
      * {@inheritDoc}
      */
-    protected static function getFacadeAccessor(): string
+    protected static function get_facade_accessor(): string
     {
-        return \Fruitcake\LaravelDebugbar\LaravelDebugbar::class;
+        return \Fruitcake\Laravel_Debugbar\Laravel_Debugbar::class;
     }
 }

@@ -1,26 +1,22 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Fruitcake\Laravel_Debugbar\Controllers;
 
-namespace Fruitcake\LaravelDebugbar\Controllers;
-
-use Fruitcake\LaravelDebugbar\Requests\CacheDeleteRequest;
-use Illuminate\Cache\CacheManager;
-
-class CacheController
+use Fruitcake\Laravel_Debugbar\Requests\Cache_Delete_Request;
+use Illuminate\Cache\Cache_Manager;
+class Cache_Controller
 {
     /**
      * Forget a cache key
      *
      */
-    public function delete(CacheManager $cache, CacheDeleteRequest $request, string $key): \Illuminate\Http\JsonResponse
+    public function delete(Cache_Manager $cache, Cache_Delete_Request $request, string $key): \Illuminate\Http\Json_Response
     {
         if ($tags = $request->validated('tags')) {
             $cache = $cache->tags($tags);
         }
-
         $success = $cache->forget($key);
-
         return response()->json(compact('success'));
     }
 }

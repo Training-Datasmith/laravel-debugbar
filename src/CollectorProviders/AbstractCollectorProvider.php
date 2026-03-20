@@ -1,54 +1,40 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Fruitcake\Laravel_Debugbar\Collector_Providers;
 
-namespace Fruitcake\LaravelDebugbar\CollectorProviders;
-
-use DebugBar\DataCollector\DataCollectorInterface;
-use Fruitcake\LaravelDebugbar\LaravelDebugbar;
-
-abstract class AbstractCollectorProvider
+use Debug_Bar\Data_Collector\Data_Collector_Interface;
+use Fruitcake\Laravel_Debugbar\Laravel_Debugbar;
+abstract class Abstract_Collector_Provider
 {
-    public function __construct(
-        protected readonly LaravelDebugbar $debugbar,
-    ) {
-    }
-
-    protected function addCollector(DataCollectorInterface $collector): void
+    public function __construct(protected readonly Laravel_Debugbar $debugbar)
     {
-        $this->debugbar->addCollector($collector);
     }
-
-    public function hasCollector(string $name): bool
+    protected function add_collector(Data_Collector_Interface $collector): void
     {
-        return $this->debugbar->hasCollector($name);
+        $this->debugbar->add_collector($collector);
     }
-
-    public function getCollector(string $name): DataCollectorInterface
+    public function has_collector(string $name): bool
     {
-        return $this->debugbar->getCollector($name);
+        return $this->debugbar->has_collector($name);
     }
-
-    protected function addCollectorException(string $message, \Throwable $exception): void
+    public function get_collector(string $name): Data_Collector_Interface
     {
-        $this->addThrowable(
-            new \RuntimeException(
-                $message . ' on Laravel Debugbar: ' . $exception->getMessage(),
-                (int) $exception->getCode(),
-                $exception,
-            ),
-        );
+        return $this->debugbar->get_collector($name);
     }
-
+    protected function add_collector_exception(string $message, \Throwable $exception): void
+    {
+        $this->add_throwable(new \RuntimeException($message . ' on Laravel Debugbar: ' . $exception->get_message(), (int) $exception->get_code(), $exception));
+    }
     /**
      * Adds an exception to be profiled in the debug bar
      */
-    public function addThrowable(\Throwable $e): void
+    public function add_throwable(\Throwable $e): void
     {
-        if ($this->hasCollector('exceptions')) {
+        if ($this->has_collector('exceptions')) {
             /** @var \DebugBar\DataCollector\ExceptionsCollector $collector */
-            $collector = $this->getCollector('exceptions');
-            $collector->addThrowable($e);
+            $collector = $this->get_collector('exceptions');
+            $collector->add_throwable($e);
         }
     }
 }

@@ -1,17 +1,13 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Fruitcake\Laravel_Debugbar\Requests;
 
-namespace Fruitcake\LaravelDebugbar\Requests;
-
-use Illuminate\Foundation\Http\FormRequest;
-
-class AssetRequest extends FormRequest
+use Illuminate\Foundation\Http\Form_Request;
+class Asset_Request extends Form_Request
 {
     public function rules(): array
     {
-        return [
-            'type' => ['required', 'string', 'in:js,css'],
-        ];
+        return ['type' => ['required', 'string', 'in:js,css']];
     }
 }

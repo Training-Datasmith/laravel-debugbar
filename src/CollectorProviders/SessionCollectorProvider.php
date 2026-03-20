@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Fruitcake\Laravel_Debugbar\Collector_Providers;
 
-namespace Fruitcake\LaravelDebugbar\CollectorProviders;
-
-use Fruitcake\LaravelDebugbar\DataCollector\SessionCollector;
+use Fruitcake\Laravel_Debugbar\Data_Collector\Session_Collector;
 use Illuminate\Http\Request;
-
-class SessionCollectorProvider extends AbstractCollectorProvider
+class Session_Collector_Provider extends Abstract_Collector_Provider
 {
     public function __invoke(Request $request, array $options): void
     {
@@ -18,10 +16,9 @@ class SessionCollectorProvider extends AbstractCollectorProvider
             }
             return $value;
         }, (array) ($options['hiddens'] ?? []));
-
-        $sessionCollector = new SessionCollector();
-        $sessionCollector->addMaskedKeys($hiddens);
-        $sessionCollector->addMaskedKeys((array) ($options['masked'] ?? []));
-        $this->addCollector($sessionCollector);
+        $session_collector = new Session_Collector();
+        $session_collector->add_masked_keys($hiddens);
+        $session_collector->add_masked_keys((array) ($options['masked'] ?? []));
+        $this->add_collector($session_collector);
     }
 }

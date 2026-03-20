@@ -1,15 +1,13 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Fruitcake\Laravel_Debugbar\Collector_Providers;
 
-namespace Fruitcake\LaravelDebugbar\CollectorProviders;
-
-use DebugBar\DataCollector\PhpInfoCollector;
-
-class PhpInfoCollectorProvider extends AbstractCollectorProvider
+use Debug_Bar\Data_Collector\Php_Info_Collector;
+class Php_Info_Collector_Provider extends Abstract_Collector_Provider
 {
     public function __invoke(array $options): void
     {
-        $this->addCollector(new PhpInfoCollector());
+        $this->add_collector(new Php_Info_Collector());
     }
 }

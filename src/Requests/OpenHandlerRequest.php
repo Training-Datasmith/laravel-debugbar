@@ -1,17 +1,13 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Fruitcake\Laravel_Debugbar\Requests;
 
-namespace Fruitcake\LaravelDebugbar\Requests;
-
-use Illuminate\Foundation\Http\FormRequest;
-
-class OpenHandlerRequest extends FormRequest
+use Illuminate\Foundation\Http\Form_Request;
+class Open_Handler_Request extends Form_Request
 {
     public function rules(): array
     {
-        return [
-            'op' => ['nullable', 'string'],
-        ];
+        return ['op' => ['nullable', 'string']];
     }
 }

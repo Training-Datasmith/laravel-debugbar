@@ -1,39 +1,33 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Fruitcake\Laravel_Debugbar\Collector_Providers;
 
-namespace Fruitcake\LaravelDebugbar\CollectorProviders;
-
-use DebugBar\Bridge\Symfony\SymfonyMailCollector;
+use Debug_Bar\Bridge\Symfony\Symfony_Mail_Collector;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Mail\Events\MessageSending;
-use Illuminate\Mail\Events\MessageSent;
-
-class MailCollectorProvider extends AbstractCollectorProvider
+use Illuminate\Mail\Events\Message_Sending;
+use Illuminate\Mail\Events\Message_Sent;
+class Mail_Collector_Provider extends Abstract_Collector_Provider
 {
     public function __invoke(Dispatcher $events, array $options): void
     {
-        $mailCollector = new SymfonyMailCollector();
-        $this->addCollector($mailCollector);
-
-        $events->listen(function (MessageSent $event) use ($mailCollector): void {
-            $mailCollector->addSymfonyMessage($event->sent->getSymfonySentMessage());
+        $mail_collector = new Symfony_Mail_Collector();
+        $this->add_collector($mail_collector);
+        $events->listen(function (Message_Sent $event) use ($mail_collector): void {
+            $mail_collector->add_symfony_message($event->sent->get_symfony_sent_message());
         });
-
         if (($options['show_body'] ?? true) || ($options['full_log'] ?? false)) {
-            $mailCollector->showMessageBody();
+            $mail_collector->show_message_body();
         }
-
         if ($options['timeline'] ?? true) {
-            $timeCollector = $this->debugbar->getTimeCollector();
-
-            $events->listen(MessageSending::class, fn (MessageSending $e) => $timeCollector->startMeasure('Mail: ' . $e->message->getSubject()));
-            $events->listen(MessageSent::class, function (MessageSent $e) use ($timeCollector): void {
-                $name = 'Mail: ' . $e->message->getSubject();
-                if ($timeCollector->hasStartedMeasure($name)) {
-                    $timeCollector->stopMeasure($name);
+            $time_collector = $this->debugbar->get_time_collector();
+            $events->listen(Message_Sending::class, fn(Message_Sending $e) => $time_collector->start_measure('Mail: ' . $e->message->get_subject()));
+            $events->listen(Message_Sent::class, function (Message_Sent $e) use ($time_collector): void {
+                $name = 'Mail: ' . $e->message->get_subject();
+                if ($time_collector->has_started_measure($name)) {
+                    $time_collector->stop_measure($name);
                 } else {
-                    $timeCollector->addMeasure($name);
+                    $time_collector->add_measure($name);
                 }
             });
         }

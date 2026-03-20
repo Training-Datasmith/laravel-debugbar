@@ -1,88 +1,59 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Fruitcake\Laravel_Debugbar\Data_Collector;
 
-namespace Fruitcake\LaravelDebugbar\DataCollector;
-
-use DebugBar\DataCollector\TimeDataCollector;
+use Debug_Bar\Data_Collector\Time_Data_Collector;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
-
-class EventCollector extends TimeDataCollector
+class Event_Collector extends Time_Data_Collector
 {
-    protected array $excludedEvents = [];
-
-    protected bool $collectValues = false;
-
-    protected bool $collectListeners = false;
-
-    public function setCollectValues(bool $collectValues = true): void
+    protected array $excluded_events = [];
+    protected bool $collect_values = false;
+    protected bool $collect_listeners = false;
+    public function set_collect_values(bool $collect_values = true): void
     {
-        $this->collectValues = $collectValues;
+        $this->collect_values = $collect_values;
     }
-
-    public function setCollectListeners(bool $collectListeners = true): void
+    public function set_collect_listeners(bool $collect_listeners = true): void
     {
-        $this->collectListeners = $collectListeners;
+        $this->collect_listeners = $collect_listeners;
     }
-
-    public function setExcludedEvents(array $excludedEvents): void
+    public function set_excluded_events(array $excluded_events): void
     {
-        $this->excludedEvents = $excludedEvents;
+        $this->excluded_events = $excluded_events;
     }
-
-    public function onWildcardEvent(?string $name = null, array $data = []): void
+    public function on_wildcard_event(?string $name = null, array $data = []): void
     {
-        $currentTime = microtime(true);
-        $eventClass = explode(':', (string) $name)[0];
-
-        foreach ($this->excludedEvents as $excludedEvent) {
-            if (Str::is($excludedEvent, $eventClass)) {
+        $current_time = microtime(true);
+        $event_class = explode(':', (string) $name)[0];
+        foreach ($this->excluded_events as $excluded_event) {
+            if (Str::is($excluded_event, $event_class)) {
                 return;
             }
         }
-
-        if (! $this->collectValues) {
-            $this->addMeasure($name, $currentTime, $currentTime, [], null, $eventClass);
-
+        if (!$this->collect_values) {
+            $this->add_measure($name, $current_time, $current_time, [], null, $event_class);
             return;
         }
-
         $params = $data;
-
-        if ($this->collectListeners) {
-            $params['listeners'] = Event::getListeners($name);
+        if ($this->collect_listeners) {
+            $params['listeners'] = Event::get_listeners($name);
         }
-
-        $this->addMeasure($name, $currentTime, $currentTime, $params, null, $eventClass);
+        $this->add_measure($name, $current_time, $current_time, $params, null, $event_class);
     }
-
     public function collect(): array
     {
         $data = parent::collect();
         $data['nb_measures'] = $data['count'] = count($data['measures']);
-
         return $data;
     }
-
-    public function getName(): string
+    public function get_name(): string
     {
         return 'event';
     }
-
-    public function getWidgets(): array
+    public function get_widgets(): array
     {
-        return [
-            'events' => [
-                'icon' => 'subtask',
-                'widget' => 'PhpDebugBar.Widgets.TimelineWidget',
-                'map' => 'event',
-                'default' => '{}',
-            ],
-            'events:badge' => [
-                'map' => 'event.nb_measures',
-                'default' => 0,
-            ],
-        ];
+        return ['events' => ['icon' => 'subtask', 'widget' => 'PhpDebugBar.Widgets.TimelineWidget', 'map' => 'event', 'default' => '{}'], 'events:badge' => ['map' => 'event.nb_measures', 'default' => 0]];
     }
 }

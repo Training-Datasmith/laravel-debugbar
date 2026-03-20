@@ -1,16 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Fruitcake\Laravel_Debugbar\Data_Collector;
 
-namespace Fruitcake\LaravelDebugbar\DataCollector;
-
-class ConfigCollector extends \DebugBar\DataCollector\ConfigCollector
+class Config_Collector extends \Debug_Bar\Data_Collector\Config_Collector
 {
     public function collect(): array
     {
         // Gather data on collect
-        $this->setData(config()->all());
-
+        $this->set_data(config()->all());
         return parent::collect();
     }
 }

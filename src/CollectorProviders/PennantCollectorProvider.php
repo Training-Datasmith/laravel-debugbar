@@ -1,20 +1,17 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Fruitcake\Laravel_Debugbar\Collector_Providers;
 
-namespace Fruitcake\LaravelDebugbar\CollectorProviders;
-
-use Fruitcake\LaravelDebugbar\DataCollector\PennantCollector;
+use Fruitcake\Laravel_Debugbar\Data_Collector\Pennant_Collector;
 use Illuminate\Contracts\Foundation\Application;
-use Laravel\Pennant\FeatureManager;
-
-class PennantCollectorProvider extends AbstractCollectorProvider
+use Laravel\Pennant\Feature_Manager;
+class Pennant_Collector_Provider extends Abstract_Collector_Provider
 {
     public function __invoke(Application $app, array $options): void
     {
-        if (class_exists(FeatureManager::class) && $app->bound(FeatureManager::class)
-        ) {
-            $this->addCollector(new PennantCollector());
+        if (class_exists(Feature_Manager::class) && $app->bound(Feature_Manager::class)) {
+            $this->add_collector(new Pennant_Collector());
         }
     }
 }

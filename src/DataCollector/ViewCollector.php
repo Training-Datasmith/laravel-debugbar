@@ -1,42 +1,36 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Fruitcake\Laravel_Debugbar\Data_Collector;
 
-namespace Fruitcake\LaravelDebugbar\DataCollector;
-
-use DebugBar\DataCollector\TemplateCollector;
+use Debug_Bar\Data_Collector\Template_Collector;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
-
-class ViewCollector extends TemplateCollector
+class View_Collector extends Template_Collector
 {
-    public function getName(): string
+    public function get_name(): string
     {
         return 'views';
     }
-
     /**
      * Add a View instance to the Collector
      */
-    public function addView(View $view): void
+    public function add_view(View $view): void
     {
-        $name = $view->getName();
+        $name = $view->get_name();
         $type = null;
-        $data = $view->getData();
-        $path = $view->getPath();
-
+        $data = $view->get_data();
+        $path = $view->get_path();
         // Skip View files from strings
-        if (Str::startsWith($name, '__components::')) {
-            if ($source = $this->getRenderSource($name, $path)) {
+        if (Str::starts_with($name, '__components::')) {
+            if ($source = $this->get_render_source($name, $path)) {
                 [$name, $type, $data, $path] = $source;
             }
         }
-
         if (is_object($path)) {
             $type = $view::class;
             $path = null;
         }
-
         if ($path && $type !== 'livewire') {
             if (!$type) {
                 if (str_ends_with($path, '.blade.php')) {
@@ -45,73 +39,52 @@ class ViewCollector extends TemplateCollector
                     $type = pathinfo($path, PATHINFO_EXTENSION);
                 }
             }
-
-            $shortPath = $this->normalizeFilePath($path);
-            foreach ($this->exclude_paths as $excludePath) {
-                if (str_starts_with($shortPath, $excludePath)) {
+            $short_path = $this->normalize_file_path($path);
+            foreach ($this->exclude_paths as $exclude_path) {
+                if (str_starts_with($short_path, $exclude_path)) {
                     return;
                 }
             }
         }
-
-        $this->addTemplate($name, $data, $type, $path);
+        $this->add_template($name, $data, $type, $path);
     }
-
-    private function getRenderSource(string $name, ?string $path): ?array
+    private function get_render_source(string $name, ?string $path): ?array
     {
         $backtrace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 20);
-
         $component = null;
         $render = null;
         $view = null;
         foreach ($backtrace as $trace) {
-            $function = $trace['function'] ?? null; //@phpstan-ignore-line
+            $function = $trace['function'] ?? null;
+            //@phpstan-ignore-line
             $class = $trace['class'] ?? null;
             $file = $trace['file'] ?? null;
             $object = $trace['object'] ?? null;
             // Found an invokable class
-            if (
-                $function === '__invoke'
-                && $class === 'Livewire\Component'
-                && $object
-                && !$component
-            ) {
+            if ($function === '__invoke' && $class === 'Livewire\Component' && $object && !$component) {
                 /** @var \Livewire\Component $component */
                 $component = $trace['object'];
                 $name = $component::class;
                 $type = 'livewire';
-                $path = (new \ReflectionClass($component))->getFileName();
+                $path = (new \ReflectionClass($component))->get_file_name();
                 $component = [$name, $type, [], $path];
             }
-            if (
-                (
-                    ($function === 'render' && $class === 'Illuminate\View\Compilers\BladeCompiler')
-                    || ($function === '__callStatic' && $class === 'Illuminate\Support\Facades\Facade' && ($trace['args'][0] ?? null) === 'render')
-                )
-                && !str_contains((string) $file, '/Illuminate/')
-                && !$render
-            ) {
+            if (($function === 'render' && $class === 'Illuminate\View\Compilers\BladeCompiler' || $function === '__callStatic' && $class === 'Illuminate\Support\Facades\Facade' && ($trace['args'][0] ?? null) === 'render') && !str_contains((string) $file, '/Illuminate/') && !$render) {
                 $render = [$name, 'render', [], $file];
             }
-
-            if (!$view && $class === 'Illuminate\View\View' && $object instanceof View && !str_starts_with($object->getName(), '__components::')
-            ) {
-                $view  = [$object->getName(), null, $object->getData(), $object->getPath()];
+            if (!$view && $class === 'Illuminate\View\View' && $object instanceof View && !str_starts_with($object->get_name(), '__components::')) {
+                $view = [$object->get_name(), null, $object->get_data(), $object->get_path()];
             }
         }
-
         if ($component) {
             return $component;
         }
-
         if ($render) {
             return $render;
         }
-
         if ($view) {
             return $view;
         }
-
         return null;
     }
 }

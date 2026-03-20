@@ -1,14 +1,12 @@
 <?php
 
-declare(strict_types=1);
-
-namespace Fruitcake\LaravelDebugbar\Middleware;
+declare (strict_types=1);
+namespace Fruitcake\Laravel_Debugbar\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
 use Laravel\Telescope\Telescope;
-
-readonly class StopRecordingTelescope
+readonly class Stop_Recording_Telescope
 {
     /**
      * Handle an incoming request.
@@ -18,9 +16,8 @@ readonly class StopRecordingTelescope
     public function handle($request, Closure $next): mixed
     {
         if (class_exists(Telescope::class)) {
-            Telescope::stopRecording();
+            Telescope::stop_recording();
         }
-
         return $next($request);
     }
 }

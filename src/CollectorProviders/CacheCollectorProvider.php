@@ -1,44 +1,35 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Fruitcake\Laravel_Debugbar\Collector_Providers;
 
-namespace Fruitcake\LaravelDebugbar\CollectorProviders;
-
-use Fruitcake\LaravelDebugbar\DataCollector\CacheCollector;
+use Fruitcake\Laravel_Debugbar\Data_Collector\Cache_Collector;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Http\Request;
-
-class CacheCollectorProvider extends AbstractCollectorProvider
+class Cache_Collector_Provider extends Abstract_Collector_Provider
 {
     public function __invoke(Request $request, Dispatcher $events, array $options): void
     {
-        $collectValues = $options['values'] ?? false;
-        $startTime = (float) $request->server('REQUEST_TIME_FLOAT');
-        $cacheCollector = new CacheCollector($startTime, $collectValues);
-        $this->addCollector($cacheCollector);
-
+        $collect_values = $options['values'] ?? false;
+        $start_time = (float) $request->server('REQUEST_TIME_FLOAT');
+        $cache_collector = new Cache_Collector($start_time, $collect_values);
+        $this->add_collector($cache_collector);
         if ($options['timeline'] ?? false) {
-            $cacheCollector->setTimeDataCollector($this->debugbar->getTimeCollector());
+            $cache_collector->set_time_data_collector($this->debugbar->get_time_collector());
         }
-
-        $classMap = $cacheCollector->getCacheEvents();
-        foreach (array_keys($classMap) as $eventClass) {
-            $events->listen($eventClass, function (\Illuminate\Cache\Events\CacheEvent|\Illuminate\Cache\Events\CacheFailedOver|\Illuminate\Cache\Events\CacheFlushed|\Illuminate\Cache\Events\CacheFlushFailed|\Illuminate\Cache\Events\CacheFlushing $event) use ($cacheCollector): void {
-                if ($this->debugbar->isEnabled()) {
-                    $cacheCollector->onCacheEvent($event);
+        $class_map = $cache_collector->get_cache_events();
+        foreach (array_keys($class_map) as $event_class) {
+            $events->listen($event_class, function (\Illuminate\Cache\Events\Cache_Event|\Illuminate\Cache\Events\Cache_Failed_Over|\Illuminate\Cache\Events\Cache_Flushed|\Illuminate\Cache\Events\Cache_Flush_Failed|\Illuminate\Cache\Events\Cache_Flushing $event) use ($cache_collector): void {
+                if ($this->debugbar->is_enabled()) {
+                    $cache_collector->on_cache_event($event);
                 }
             });
         }
-
-        $startEvents = array_unique(array_filter(array_map(
-            fn (array $values) => $values[1] ?? null,
-            array_values($classMap),
-        )));
-
-        foreach ($startEvents as $eventClass) {
-            $events->listen($eventClass, function ($event) use ($cacheCollector): void {
-                if ($this->debugbar->isEnabled()) {
-                    $cacheCollector->onStartCacheEvent($event);
+        $start_events = array_unique(array_filter(array_map(fn(array $values) => $values[1] ?? null, array_values($class_map))));
+        foreach ($start_events as $event_class) {
+            $events->listen($event_class, function ($event) use ($cache_collector): void {
+                if ($this->debugbar->is_enabled()) {
+                    $cache_collector->on_start_cache_event($event);
                 }
             });
         }

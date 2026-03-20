@@ -1,15 +1,13 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Fruitcake\Laravel_Debugbar\Data_Collector;
 
-namespace Fruitcake\LaravelDebugbar\DataCollector;
-
-use DebugBar\DataCollector\DataCollector;
-use DebugBar\DataCollector\DataCollectorInterface;
-use DebugBar\DataCollector\Renderable;
+use Debug_Bar\Data_Collector\Data_Collector;
+use Debug_Bar\Data_Collector\Data_Collector_Interface;
+use Debug_Bar\Data_Collector\Renderable;
 use Laravel\Pennant\Feature;
-
-class PennantCollector extends DataCollector implements DataCollectorInterface, Renderable
+class Pennant_Collector extends Data_Collector implements Data_Collector_Interface, Renderable
 {
     /**
      * {@inheritdoc}
@@ -18,27 +16,18 @@ class PennantCollector extends DataCollector implements DataCollectorInterface, 
     {
         return Feature::all();
     }
-
     /**
      * {@inheritDoc}
      */
-    public function getName(): string
+    public function get_name(): string
     {
         return 'pennant';
     }
-
     /**
      * {@inheritDoc}
      */
-    public function getWidgets(): array
+    public function get_widgets(): array
     {
-        return [
-            'pennant' => [
-                'icon' => 'flag',
-                'widget' => 'PhpDebugBar.Widgets.VariableListWidget',
-                'map' => 'pennant',
-                'default' => '{}',
-            ],
-        ];
+        return ['pennant' => ['icon' => 'flag', 'widget' => 'PhpDebugBar.Widgets.VariableListWidget', 'map' => 'pennant', 'default' => '{}']];
     }
 }

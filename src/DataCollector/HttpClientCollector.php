@@ -1,79 +1,57 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Fruitcake\Laravel_Debugbar\Data_Collector;
 
-namespace Fruitcake\LaravelDebugbar\DataCollector;
-
-use DebugBar\DataCollector\HttpCollector;
-use Illuminate\Http\Client\Events\ConnectionFailed;
-use Illuminate\Http\Client\Events\ResponseReceived;
+use Debug_Bar\Data_Collector\Http_Collector;
+use Illuminate\Http\Client\Events\Connection_Failed;
+use Illuminate\Http\Client\Events\Response_Received;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Str;
-
-class HttpClientCollector extends HttpCollector
+class Http_Client_Collector extends Http_Collector
 {
-    public function addEvent(ResponseReceived|ConnectionFailed $event): void
+    public function add_event(Response_Received|Connection_Failed $event): void
     {
-        $headers =  $this->hideMaskedValues($event->request->headers());
-
-        if ($event->request->isMultipart()) {
-            $requestData = '[MULTIPART]';
+        $headers = $this->hide_masked_values($event->request->headers());
+        if ($event->request->is_multipart()) {
+            $request_data = '[MULTIPART]';
         } else {
-            $requestData = $this->hideMaskedValues($event->request->data());
+            $request_data = $this->hide_masked_values($event->request->data());
         }
-
         $status = null;
         $duration = null;
-        $details = [
-            'request_data' => $requestData,
-            'request_headers' => $headers,
-        ];
-
-        if ($event instanceof ResponseReceived) {
+        $details = ['request_data' => $request_data, 'request_headers' => $headers];
+        if ($event instanceof Response_Received) {
             $status = $event->response->status();
-            $duration = $event->response->transferStats?->getTransferTime();
-            $details['response'] = $this->parseResponse($event->response);
-            $details['response_headers'] = $this->hideMaskedValues($event->response->headers());
+            $duration = $event->response->transfer_stats?->get_transfer_time();
+            $details['response'] = $this->parse_response($event->response);
+            $details['response_headers'] = $this->hide_masked_values($event->response->headers());
         }
-
         // @phpstan-ignore-next-line because exception might not be set in Laravel 10
-        if ($event instanceof ConnectionFailed && isset($event->exception)) {
+        if ($event instanceof Connection_Failed && isset($event->exception)) {
             $details['exception'] = $event->exception;
         }
-
-        $this->addRequest(
-            $event->request->method(),
-            $event->request->url(),
-            $status,
-            $duration,
-            $details
-        );
+        $this->add_request($event->request->method(), $event->request->url(), $status, $duration, $details);
     }
-
-    protected function parseResponse(Response $response): string|array
+    protected function parse_response(Response $response): string|array
     {
         if ($response->redirect()) {
             return 'Redirect: ' . $response->header('Location');
         }
-
         // Check if stream
-        $stream = $response->toPsrResponse()->getBody();
-        if (! $stream->isSeekable()) {
+        $stream = $response->to_psr_response()->get_body();
+        if (!$stream->is_seekable()) {
             return '[STREAM]';
         }
-
         $content = $response->body();
         $stream->rewind();
-
         if ($content === '') {
             return '[EMPTY]';
         }
-
         $json = json_decode($content, true);
         if ($json) {
             return $json;
         }
-
         return Str::limit($content, 1024);
     }
 }

@@ -1,49 +1,41 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Fruitcake\Laravel_Debugbar\Support\Clockwork;
 
-namespace Fruitcake\LaravelDebugbar\Support\Clockwork;
-
-use DebugBar\DataCollector\DataCollector;
-use DebugBar\DataCollector\DataCollectorInterface;
-use DebugBar\DataCollector\Renderable;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-
+use Debug_Bar\Data_Collector\Data_Collector;
+use Debug_Bar\Data_Collector\Data_Collector_Interface;
+use Debug_Bar\Data_Collector\Renderable;
+use Symfony\Component\Http_Foundation\Request;
+use Symfony\Component\Http_Foundation\Response;
 /**
  *
  * Based on \Symfony\Component\HttpKernel\DataCollector\RequestDataCollector by Fabien Potencier <fabien@symfony.com>
  *
  */
-class ClockworkCollector extends DataCollector implements DataCollectorInterface, Renderable
+class Clockwork_Collector extends Data_Collector implements Data_Collector_Interface, Renderable
 {
     protected Request $request;
     protected Response $response;
-
-    public function __construct(
-        Request $request,
-        Response $response
-    ) {
+    public function __construct(Request $request, Response $response)
+    {
         $this->request = $request;
         $this->response = $response;
     }
-
     /**
      * {@inheritDoc}
      */
-    public function getName(): string
+    public function get_name(): string
     {
         return 'clockwork';
     }
-
     /**
      * {@inheritDoc}
      */
-    public function getWidgets(): array
+    public function get_widgets(): array
     {
         return [];
     }
-
     /**
      * {@inheritdoc}
      */
@@ -51,25 +43,13 @@ class ClockworkCollector extends DataCollector implements DataCollectorInterface
     {
         $request = $this->request;
         $response = $this->response;
-
-        $data = [
-            'getData' => $request->query->all(),
-            'postData' => $request->request->all(),
-            'headers' => $request->headers->all(),
-            'cookies' => $request->cookies->all(),
-            'uri' => $request->getRequestUri(),
-            'method' => $request->getMethod(),
-            'responseStatus' => $response->getStatusCode(),
-        ];
-
-        if ($this->request->hasSession()) {
-            $data['sessionData'] = $this->request->getSession()->all();
+        $data = ['getData' => $request->query->all(), 'postData' => $request->request->all(), 'headers' => $request->headers->all(), 'cookies' => $request->cookies->all(), 'uri' => $request->get_request_uri(), 'method' => $request->get_method(), 'responseStatus' => $response->get_status_code()];
+        if ($this->request->has_session()) {
+            $data['sessionData'] = $this->request->get_session()->all();
         }
-
         if (isset($data['headers']['authorization'][0])) {
             $data['headers']['authorization'][0] = substr($data['headers']['authorization'][0], 0, 12) . '******';
         }
-
-        return $this->hideMaskedValues($data);
+        return $this->hide_masked_values($data);
     }
 }
