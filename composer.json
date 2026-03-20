@@ -49,7 +49,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Fruitcake\\LaravelDebugbar\\": "src/"
+            "Fruitcake\\Laravel_Debugbar\\": "src/"
         },
         "files": [
             "src/helpers.php"
@@ -57,7 +57,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Fruitcake\\LaravelDebugbar\\Tests\\": "tests"
+            "Fruitcake\\Laravel_Debugbar\\Tests\\": "tests"
         }
     },
     "minimum-stability": "dev",
